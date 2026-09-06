@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="eKSAnKvO34fAOL1165PwSG">
+<head data-page-node-id="Hg5oFs86BKS5V7pTDhcj5Y">
+<meta charset="UTF-8" data-page-node-id="XwmgbreMUGi0TzcMVgLydQ">
+<meta name="viewport" content="width=device-width, initial-scale=1" data-page-node-id="BSdnJ6v5MHTlxyj1hdDXF1">
+<title>直流电机结构闯关赛 · 学生版</title>
+<style>
+:root{
+  --bg1:#eef2f7; --bg2:#dfe6ef;
+  --card:#fff; --line:#e2e8f0; --text:#1e293b; --muted:#64748b;
+  --brand:#2563eb; --brand-soft:#dbeafe; --brand-dark:#1d4ed8;
+  --ok:#16a34a; --ok-soft:#dcfce7; --err:#dc2626; --err-soft:#fee2e2; --warn:#d97706; --warn-soft:#fef3c7;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; color:var(--text);
+  font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB",system-ui,sans-serif;
+  background:linear-gradient(160deg,var(--bg1),var(--bg2)); -webkit-font-smoothing:antialiased;
+}
+header{
+  padding:12px 22px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;
+  background:#fff; border-bottom:1px solid var(--line); box-shadow:0 1px 3px rgba(15,23,42,.04);
+}
+.brand h1{margin:0; font-size:19px; letter-spacing:.5px}
+.brand span{font-size:12px; color:var(--muted)}
+.hud{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.hud .chip{
+  background:#f8fafc; border:1px solid var(--line); border-radius:999px; padding:5px 12px; font-size:13px;
+}
+.hud .chip b{color:var(--brand-dark)}
+.hud .chip.cap b{color:var(--warn)}
+button{font:inherit; font-size:13px; cursor:pointer; border-radius:9px; border:1px solid var(--line);
+  background:#f8fafc; color:var(--text); padding:7px 13px; transition:.15s}
+button:hover{border-color:#cbd5e1; background:#f1f5f9}
+button.active{background:var(--brand); border-color:var(--brand); color:#fff}
+button.primary{background:var(--brand); border-color:var(--brand); color:#fff; font-weight:700}
+button.primary:hover{background:var(--brand-dark)}
+button.danger{color:var(--err); border-color:#fecaca}
+.seg{display:flex; border:1px solid var(--line); border-radius:9px; overflow:hidden}
+.seg button{border:0; border-radius:0; background:#f8fafc}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.active{background:var(--brand); color:#fff}
+main{max-width:1180px; margin:0 auto; padding:18px}
+.layout{display:flex; gap:18px; align-items:flex-start}
+@media (max-width:900px){ .layout{flex-direction:column} }
+.stage{flex:1 1 auto; min-width:0; background:var(--card); border:1px solid var(--line); border-radius:14px;
+  padding:12px; box-shadow:0 6px 20px rgba(15,23,42,.06)}
+.stage-top{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap}
+.stage-top h2{margin:0; font-size:15px}
+.legend{font-size:12px; color:var(--muted)}
+svg#motor{width:100%; height:auto; max-height:60vh; display:block; touch-action:manipulation}
+.p{fill:var(--c,#94a3b8); stroke:#334155; stroke-width:1.1; transition:fill .18s, stroke .18s}
+.wire{fill:rgba(0,0,0,.28)}
+.segline{fill:rgba(0,0,0,.32)}
+.lam{stroke:rgba(0,0,0,.16); stroke-width:1; fill:none}
+.lead{stroke:#94a3b8; stroke-width:1.2; fill:none; opacity:0; pointer-events:none}
+g[data-part]{cursor:pointer; --c:#94a3b8}
+g[data-part]:hover .p{stroke:#dc2626; stroke-width:2.2}
+g[data-part].hl{--c:#fecaca !important}
+g[data-part].hl .p{stroke:#dc2626; stroke-width:3.6; filter:drop-shadow(0 0 7px rgba(220,38,38,.95))}
+g[data-part].ok{--c:#86efac !important}
+g[data-part].ok .p{stroke:var(--ok); stroke-width:3; filter:drop-shadow(0 0 6px rgba(22,163,74,.85))}
+g[data-part].no{--c:#fca5a5 !important}
+g[data-part].no .p{stroke:var(--err); stroke-width:3; filter:drop-shadow(0 0 6px rgba(220,38,38,.85))}
+g[data-part].pulse .p{stroke:#dc2626; stroke-width:3.2}
+g[data-part].pulse{animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{0%,100%{filter:drop-shadow(0 0 3px rgba(220,38,38,.55)); opacity:1}
+  50%{filter:drop-shadow(0 0 11px rgba(220,38,38,1)); opacity:.5}}
+.lbl{font-size:12px; fill:#0f172a; text-anchor:middle; paint-order:stroke; stroke:#fff; stroke-width:3.2;
+  stroke-linejoin:round; opacity:0; transition:opacity .2s; pointer-events:none; font-weight:700}
+body.showlabels .lbl{opacity:1}
+body.showlabels .lead{opacity:.85}
+.panel{width:340px; flex:0 0 340px; background:var(--card); border:1px solid var(--line); border-radius:14px;
+  padding:16px; box-shadow:0 6px 20px rgba(15,23,42,.06)}
+@media (max-width:900px){ .panel{width:100%; flex:1 1 auto} }
+.badge{display:inline-block; font-size:12px; padding:3px 9px; border-radius:999px; background:var(--brand-soft); color:var(--brand-dark)}
+.q-name{font-size:24px; font-weight:800; margin:10px 0 6px; letter-spacing:1px}
+.q-tip{font-size:13px; color:#475569; background:#f8fafc; border-left:3px solid var(--brand); padding:8px 10px; border-radius:0 8px 8px 0; line-height:1.6}
+.opts{display:grid; gap:8px; margin-top:12px}
+.opt{text-align:left; padding:11px 13px; font-size:14px; border-radius:10px; border:1px solid var(--line); background:#f8fafc}
+.opt:hover:not(:disabled){background:#eef2ff; border-color:#c7d2fe}
+.opt.ok{background:var(--ok-soft); border-color:var(--ok); color:#14532d}
+.opt.no{background:var(--err-soft); border-color:var(--err); color:#7f1d1d}
+.opt:disabled{cursor:default}
+.timer{height:6px; border-radius:999px; background:#e2e8f0; overflow:hidden; margin-top:12px}
+.timer i{display:block; height:100%; width:100%; background:linear-gradient(90deg,#38bdf8,#2563eb); transition:width .2s linear}
+.timer.low i{background:linear-gradient(90deg,#fbbf24,#dc2626)}
+.stats{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap}
+.stat{flex:1 1 0; min-width:78px; background:#f8fafc; border:1px solid var(--line); border-radius:10px; padding:8px 10px}
+.stat b{display:block; font-size:19px}
+.stat span{font-size:12px; color:var(--muted)}
+.card-info h3{margin:4px 0 2px; font-size:19px}
+.card-info .role{font-size:13px; color:#475569; line-height:1.75; margin:8px 0}
+.card-info .tip{font-size:13px; background:var(--warn-soft); border-radius:8px; padding:8px 10px; color:#78350f; line-height:1.6}
+.tags{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px}
+.tag{padding:7px 11px; border-radius:9px; background:#fff; border:1px solid var(--line); font-size:13px;
+  cursor:grab; user-select:none; touch-action:none; box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.tag:hover{border-color:var(--brand); color:var(--brand-dark)}
+.tag.done{background:var(--ok-soft); border-color:var(--ok); color:#14532d; cursor:default}
+.tag.wrong{background:var(--err-soft); border-color:var(--err); color:#7f1d1d; animation:shake .35s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.ghost-tag{position:fixed; z-index:99; pointer-events:none; opacity:.92; transform:translate(-50%,-50%);
+  padding:7px 11px; border-radius:9px; background:#fff; border:1px solid var(--brand); font-size:13px;
+  box-shadow:0 6px 16px rgba(15,23,42,.18)}
+.hint{font-size:13px; color:var(--muted); line-height:1.7; margin-top:10px}
+.result h3{margin:0 0 6px; font-size:20px}
+.result .score{font-size:34px; font-weight:800; color:var(--brand); letter-spacing:1px}
+.wrongs{margin-top:10px; text-align:left}
+.wrongs div{padding:6px 9px; border-radius:8px; background:var(--err-soft); color:#7f1d1d; font-size:13px; margin-bottom:6px; cursor:pointer}
+.flash{position:fixed; left:50%; top:74px; transform:translateX(-50%); z-index:80; padding:9px 18px; border-radius:999px;
+  font-weight:700; font-size:15px; box-shadow:0 6px 18px rgba(15,23,42,.15); opacity:0; transition:.2s; pointer-events:none}
+.flash.show{opacity:1}
+.flash.ok{background:var(--ok-soft); color:#14532d; border:1px solid var(--ok)}
+.flash.no{background:var(--err-soft); color:#7f1d1d; border:1px solid var(--err)}
+/* 遮罩 */
+.mask{position:fixed; inset:0; background:rgba(15,23,42,.55); backdrop-filter:blur(3px); z-index:120;
+  display:flex; align-items:center; justify-content:center; padding:20px; overflow:auto}
+.mask.hide{display:none}
+.sheet{background:#fff; border-radius:16px; padding:24px; width:100%; max-width:520px; box-shadow:0 20px 50px rgba(15,23,42,.3)}
+.sheet h2{margin:0 0 4px; font-size:21px}
+.sheet .sub{color:var(--muted); font-size:13px; margin-bottom:16px; line-height:1.7}
+.field{margin-bottom:14px}
+.field label{display:block; font-size:13px; margin-bottom:6px; font-weight:700}
+.field input{width:100%; font:inherit; font-size:15px; padding:11px 12px; border:1px solid var(--line);
+  border-radius:10px; background:#f8fafc; outline:none}
+.field input:focus{border-color:var(--brand); background:#fff; box-shadow:0 0 0 3px var(--brand-soft)}
+.err-msg{color:var(--err); font-size:13px; min-height:20px; margin:2px 0 10px}
+.rules{background:#f8fafc; border:1px dashed var(--line); border-radius:10px; padding:10px 12px; font-size:12.5px; color:#475569; line-height:1.8; margin-bottom:14px}
+.welcome{background:var(--brand-soft); color:var(--brand-dark); border-radius:10px; padding:10px 12px; font-size:13px; margin-bottom:14px; line-height:1.7}
+/* 后台表格 */
+.sheet.wide{max-width:1000px}
+.toolbar{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px}
+.toolbar input{font:inherit; font-size:13px; padding:7px 10px; border:1px solid var(--line); border-radius:9px; background:#f8fafc}
+table{width:100%; border-collapse:collapse; font-size:13px}
+th,td{border:1px solid var(--line); padding:8px 10px; text-align:left; white-space:nowrap}
+th{background:#f1f5f9; font-weight:700; cursor:pointer; user-select:none}
+th:hover{background:#e2e8f0}
+tbody tr:nth-child(even){background:#fafbfc}
+td.num{text-align:right; font-variant-numeric:tabular-nums}
+.pill{display:inline-block; min-width:22px; padding:2px 8px; border-radius:999px; background:var(--brand-soft); color:var(--brand-dark); font-weight:700}
+.pill.full{background:var(--ok-soft); color:#14532d}
+.fold td{background:#fff; white-space:normal; color:#475569; font-size:12px; line-height:1.8}
+.sum{display:flex; gap:10px; flex-wrap:wrap; margin:12px 0}
+.sum div{flex:1 1 110px; background:#f8fafc; border:1px solid var(--line); border-radius:10px; padding:8px 10px}
+.sum b{display:block; font-size:20px; color:var(--brand-dark)}
+.sum span{font-size:12px; color:var(--muted)}
+.foot{max-width:1180px; margin:0 auto; padding:0 18px 30px; font-size:12px; color:var(--muted); line-height:1.8}
+/* 闯关关卡地图 */
+.lv-top{background:var(--brand-soft);color:var(--brand-dark);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.8;margin:10px 0 12px}
+.lv-list{display:flex;flex-direction:column;gap:10px}
+.lv-card{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;display:flex;gap:12px;align-items:center}
+.lv-card.lock{background:#f8fafc;color:var(--muted)}
+.lv-card.done{border-color:#86efac;background:var(--ok-soft)}
+.lv-card.cur{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.lv-no{width:38px;height:38px;flex:0 0 38px;border-radius:10px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px}
+.lv-card.lock .lv-no{background:#cbd5e1}
+.lv-card.done .lv-no{background:#16a34a}
+.lv-main{flex:1;min-width:0}
+.lv-main b{font-size:15px}
+.lv-meta{font-size:12px;color:var(--muted);line-height:1.8;margin-top:3px}
+.lv-tag{display:inline-block;font-size:11px;border:1px solid var(--line);border-radius:999px;padding:1px 7px;margin-left:6px;color:var(--muted);vertical-align:2px}
+.star{color:var(--warn);letter-spacing:1px}
+.lv-btn{flex:0 0 auto}
+kbd{background:#f1f5f9; border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; padding:1px 5px; font-size:12px}
+.type-badge{display:inline-block;font-size:12px;padding:2px 9px;border-radius:999px;vertical-align:2px;margin-left:6px;font-weight:600}
+/* 定子·转子辨析面板 */
+.sr-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:4px 0 14px}
+.sr-card{border:1px solid var(--c,var(--line));border-left:5px solid var(--c,var(--line));border-radius:12px;padding:13px 15px;background:#fff}
+.sr-card h3{margin:0 0 8px;font-size:16px;display:flex;align-items:center;gap:8px;color:var(--c,var(--ink))}
+.sr-card .dot{width:12px;height:12px;border-radius:50%;background:var(--c,var(--ink));flex:0 0 auto}
+.sr-card p{font-size:13px;line-height:1.8;color:#475569;margin:6px 0}
+.sr-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.sr-chip{cursor:pointer;border:1px solid var(--c,var(--line));color:var(--c,var(--ink));background:color-mix(in srgb,var(--c,var(--ink)) 10%,#fff);border-radius:999px;padding:3px 11px;font-size:12.5px;transition:.15s;user-select:none}
+.sr-chip:hover{background:var(--c,var(--ink));color:#fff}
+.sr-compare h3{font-size:15px;margin:6px 0}
+.sr-compare table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}
+.sr-compare th,.sr-compare td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+.sr-compare th{background:#f8fafc;font-weight:600}
+.sr-compare td:first-child{font-weight:600;white-space:nowrap;background:#fbfdff}
+@media(max-width:720px){ .sr-grid{grid-template-columns:1fr} }
+/* 教师菜单 */
+.tm-btns{display:flex;flex-direction:column;gap:12px;margin:6px 0}
+.tm-btns button{padding:15px 16px;font-size:16px;font-weight:700;text-align:left;border-radius:12px}
+.tm-play{background:var(--brand);border-color:var(--brand);color:#fff}
+.tm-play:hover{background:var(--brand-dark)}
+.tm-admin{background:#f8fafc}
+.pill.teacher{background:#ede9fe;color:#6d28d9;border-color:#ddd6fe}
+
+/* ===================== 移动端适配 ===================== */
+html,body{max-width:100%;overflow-x:hidden}
+@media (max-width:640px){
+  header{padding:10px 12px;gap:8px}
+  .brand h1{font-size:16px}
+  .brand span{font-size:11px;line-height:1.4}
+  .hud{gap:6px}
+  button{font-size:14px;padding:9px 12px;min-height:42px}
+  .hud .chip{font-size:12px;padding:5px 10px}
+  .hud .chip b{font-size:13px}
+  main{padding:10px}
+  .layout{gap:12px}
+  .stage{padding:10px}
+  .stage-top{flex-direction:column;align-items:flex-start;gap:6px}
+  .stage-top h2{font-size:14px}
+  .panel{padding:14px}
+  .q-name{font-size:20px}
+  .seg button{padding:9px 10px;min-height:42px;font-size:13px}
+  .stat{flex:1 1 40%;min-width:0}
+  .lv-card{flex-wrap:wrap;gap:10px}
+  .lv-btn{flex:1 1 100%}
+  .lv-btn button{width:100%}
+  .sheet{padding:18px 16px}
+  .sheet h2{font-size:19px}
+  .tm-btns button{min-height:52px}
+  .toolbar input,.toolbar button{min-height:42px;flex:1 1 auto}
+  table{font-size:12px}
+  th,td{padding:6px 7px}
+  .sum div{flex:1 1 44%}
+  svg#motor{max-height:48vh}
+}
+@media (max-width:400px){
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .stat b{font-size:16px}
+  .q-name{font-size:18px}
+}
+</style>
+</head>
+<body data-page-node-id="EGQRT5ccFPDxXx6yME5BFl">
+
+<header data-page-node-id="HmKV7MNWilEOJp5MBp1mxz">
+  <div class="brand" data-page-node-id="fcoY2hFXolkxMgqv2fyEAw">
+    <h1 data-page-node-id="ij0REjodBkXJDAU3QSq5R7">直流电机结构闯关赛</h1>
+    <span data-page-node-id="q2ZMz655Plpyw6KwQdkJtI">《机车车辆电机电器检查与装调》课堂互动 · 先登记，再闯关</span>
+  </div>
+  <div class="hud" id="hud" style="display:none" data-page-node-id="aGjnzV6HgWDmpef0WcueMh">
+    <span class="chip" data-page-node-id="GjNctG9HWaf9FAoWSfa6EG"><span id="hudRole">学生</span>：<b id="hudName" data-page-node-id="DeSFqWP0eNoXHZ20fw5K3b">—</b></span>
+    <span class="chip" data-page-node-id="GH55cb0IbCmGz3Q4jnHIC3">学号：<b id="hudSid" data-page-node-id="BsqlyV0To1BNS3N59iwnww">—</b></span>
+    <span class="chip cap" data-page-node-id="KwCSnjCTnKc6uY9BT0ZYhp">闯关积分：<b id="hudScore" data-page-node-id="JZneEVakmrs7dkG9nMhkc2">0 / 5</b></span>
+    <span class="chip" data-page-node-id="8ugVuzGBpAxLHpm7DE67lN">闯关次数：<b id="hudTimes" data-page-node-id="I4m4t4cH0bbylrZKfD7xOg">0</b></span>
+    <span class="chip" data-page-node-id="lvchip01">已通关卡：<b id="hudLevel" data-page-node-id="lvchip02">0 / 5</b></span>
+    <button id="switchBtn" data-page-node-id="AAe1QWtF6ohp2SwzozbpXb">切换学生</button>
+  </div>
+  <div class="hud" id="teacherBar" data-page-node-id="tb001">
+    <button class="danger" id="adminBtn" data-page-node-id="tb002">教师统计后台</button>
+    <span class="chip" id="teacherChip" style="display:none" data-page-node-id="tb003">教师：<b id="teacherWho">—</b> 已登录</span>
+    <button id="logoutBtn" style="display:none" data-page-node-id="tb004">退出登录</button>
+  </div>
+</header>
+
+<main data-page-node-id="yTKVBBJjg95fwOXSv0bNgy">
+  <div class="layout" data-page-node-id="cGM6N1DPwpEVbCAk5aGtIt">
+    <section class="stage" data-page-node-id="qOrabs8iKc1dEAYPxNeYxL">
+      <div class="stage-top" data-page-node-id="OlKDaWqvsLpr8dbGUVH5D5">
+        <h2 id="viewTitle" data-page-node-id="UmX6ESuEGSy9Rh4V9W5CU2">直流电机径向横剖面（定子 + 转子）</h2>
+        <span class="legend" id="viewLegend" data-page-node-id="yD1GOBUojhZa4eZxU7xKXf">点击图中任意部件查看名称与作用</span>
+      </div>
+      <svg id="motor" viewBox="-30 -30 620 620" role="img" aria-label="直流电机结构示意图" data-page-node-id="IrfDAduCQyBlglAUqquNi6"></svg>
+    </section>
+    <aside class="panel" id="panel" data-page-node-id="WOEvyhQJfiHGoWH1IKjH6B"></aside>
+  </div>
+</main>
+
+<!-- 登记页 -->
+<div class="mask" id="loginMask" data-page-node-id="y6kQAkpzZijuHcleCdIzdz">
+  <div class="sheet" data-page-node-id="LqIDbCidNdQ6aG9wEvWAvI">
+    <h2 data-page-node-id="l3OM4xm3tTrReIWghOgisg">请先登记信息</h2>
+    <div class="sub" data-page-node-id="rF7ULwGgt9DNokl75q2Rxe">填写学号与姓名后开始闯关；同一学号再次进入将自动沿用已有成绩。</div>
+    <div class="rules" data-page-node-id="YUMwwKUxnmlkoLFXSWaqfE">
+      计分规则：<b data-page-node-id="6of8eireGZHlKPdR4tYNDk">5 关全部通过记 1 分</b>（单名学生最高 <b data-page-node-id="RRFnkaxVIqlK50bqM4rccG">1 分</b>）；<br data-page-node-id="2W8kcDtny1t2kyOLL8e0o5">
+      每关需正确率 100% 才通关，任意一关连续两次未通过将退回第 1 关、成绩清零；集齐全部 5 关即获得 1 分。
+    </div>
+    <div id="welcomeBox" data-page-node-id="NM3IVKFVqIgZq87g3CSGQo"></div>
+    <div class="field" data-page-node-id="BQMfla7R0FSjgT3DhkMnJc">
+      <label for="sid" data-page-node-id="4EFD5haYRAty7GjuXozgQH">学号（必填）</label>
+      <input id="sid" placeholder="例如：2024030112" autocomplete="off" maxlength="20" data-page-node-id="MAIhmE7kZyTAHH9AlY86hJ">
+    </div>
+    <div class="field" data-page-node-id="RUso9cCrFIjDGqBbiPTDU9">
+      <label for="sname" data-page-node-id="K3AANBzgur45s1IgAoAtpw">姓名（必填）</label>
+      <input id="sname" placeholder="请输入真实姓名" autocomplete="off" maxlength="20" data-page-node-id="fdEKhbkPWkbbyoFZRxQ3rm">
+    </div>
+    <div class="err-msg" id="loginErr" data-page-node-id="vObULAQOlv38MWvE0PMFWw"></div>
+    <button class="primary" id="startBtn" style="width:100%;padding:12px;font-size:15px" data-page-node-id="s0qcdhaLFFASVtYxjo1T8w">开始闯关</button>
+    <div style="text-align:center;margin-top:14px" data-page-node-id="tb010">
+      <button id="teacherEntry" data-page-node-id="tb011">教师入口：查看 / 导出成绩</button>
+    </div>
+  </div>
+</div>
+
+<!-- 教师登录 -->
+<div class="mask hide" id="teacherMask" data-page-node-id="tb020">
+  <div class="sheet" data-page-node-id="tb021">
+    <h2 data-page-node-id="tb022">教师身份验证</h2>
+    <div class="sub" data-page-node-id="tb023">查看学生成绩统计、导出 CSV / JSON 备份，需先使用<b data-page-node-id="tb024">教师号 + 姓名</b>登录；未登录时只能进行闯关练习，不能导出任何数据。</div>
+    <div class="field" data-page-node-id="tb025">
+      <label for="tid" style="display:flex;justify-content:space-between;align-items:center" data-page-node-id="tb026">
+        <span data-page-node-id="tb026a">教师号（必填）</span>
+        <span style="font-weight:400;color:var(--muted);display:flex;align-items:center;gap:4px" data-page-node-id="tb027">
+          <input type="checkbox" id="showTid" style="width:auto" data-page-node-id="tb028">显示
+        </span>
+      </label>
+      <input id="tid" type="password" placeholder="请输入教师号（3～12 位数字）" autocomplete="off" maxlength="20" data-page-node-id="tb029">
+    </div>
+    <div class="field" data-page-node-id="tb030">
+      <label for="tname" data-page-node-id="tb031">姓名（必填）</label>
+      <input id="tname" placeholder="请输入教师姓名" autocomplete="off" maxlength="20" data-page-node-id="tb032">
+    </div>
+    <div class="err-msg" id="teacherErr" data-page-node-id="tb033"></div>
+    <button class="primary" id="teacherLoginBtn" style="width:100%;padding:12px;font-size:15px" data-page-node-id="tb034">验证并进入后台</button>
+    <div style="text-align:center;margin-top:12px" data-page-node-id="tb035">
+      <button id="teacherCancel" data-page-node-id="tb036">返回</button>
+    </div>
+  </div>
+</div>
+
+<!-- 教师菜单：选择进入闯关模式或查看成绩后台 -->
+<div class="mask hide" id="teacherMenu" data-page-node-id="tm001">
+  <div class="sheet" data-page-node-id="tm002">
+    <h2 data-page-node-id="tm003">欢迎，<span id="tmName">老师</span></h2>
+    <div class="sub" data-page-node-id="tm004">请选择要进入的界面。以教师身份进入闯关模式后，您的试玩记录也会保存在本机成绩库中（标记为「教师」）。</div>
+    <div class="tm-btns" data-page-node-id="tm005">
+      <button class="tm-play" id="tmPlay" data-page-node-id="tm006">▶ 进入闯关模式（试玩 / 演示）</button>
+      <button class="tm-admin" id="tmAdmin" data-page-node-id="tm007">📊 查看成绩统计后台</button>
+    </div>
+    <div style="text-align:center;margin-top:14px" data-page-node-id="tm008">
+      <button id="teacherMenuBack" data-page-node-id="tm009">返回登录</button>
+    </div>
+  </div>
+</div>
+
+<!-- 教师后台 -->
+<div class="mask hide" id="adminMask" data-page-node-id="JQ0nIGgnFfaBltHr1wwZBj">
+  <div class="sheet wide" data-page-node-id="cbiZh5bEZsSDuYdX3tkxi3">
+    <h2 data-page-node-id="zjnoiRKGnDACC3uzZIK6xe">学生闯关成绩统计</h2>
+    <div class="sub" data-page-node-id="XaPW0ji7RzFZTKpYLZvWrv">数据保存在本机浏览器（localStorage），可导出 CSV 用 WPS/Excel 打开，或导出 JSON 备份后在其他电脑导入合并。</div>
+    <div class="sum" id="sumBox" data-page-node-id="YLgbvPUB7VVohF2Fx0OHP4"></div>
+    <div class="toolbar" data-page-node-id="NolQ9Y4SGHpJey3lmyWvCv">
+      <input id="kw" placeholder="搜索学号或姓名" data-page-node-id="8TXuf2z5rHS5Xw3VBRwkn1">
+      <button id="sortScore" data-page-node-id="HCHDGp3S7duNvwfQaj3Mnn">按得分排序</button>
+      <button id="sortTime" data-page-node-id="oSQ2i6jw2WXoJgD6jL5ABT">按最近时间排序</button>
+      <button id="expCsv" data-page-node-id="QZsjq4jFiH6MVLLXv29Iy8">导出 CSV（表格）</button>
+      <button id="expDetail" data-page-node-id="oaWCyKWudnXHaBHCLHLGaA">导出闯关明细</button>
+      <button id="expJson" data-page-node-id="sH4a1Z1GKRuIO9brZOXGvN">导出 JSON 备份</button>
+      <button id="impJson" data-page-node-id="pE7FCcaVVDKKEhcrukHdD9">导入备份</button>
+      <button class="danger" id="clearAll" data-page-node-id="Qe9klGAKs6S5Oym9NxHfvC">清空全部数据</button>
+      <button id="adminLogout" data-page-node-id="tb040">退出教师登录</button>
+      <button id="closeAdmin" data-page-node-id="AhhxfJsqFEX3qBTICCb2T5">关闭</button>
+    </div>
+    <div style="overflow:auto;max-height:52vh;border:1px solid var(--line);border-radius:10px" data-page-node-id="MzgDuDtDKcm4VJ0KgmjP7r">
+      <table id="tbl" data-page-node-id="LeN2AIDbKdxMh161DqlaP5">
+        <thead data-page-node-id="HbAef8gFvPDASnjTCZidVD"><tr data-page-node-id="WjKpKXz3nqt9iMX2t4y9YF">
+          <th data-page-node-id="rnVSB4fLLXk1MxXT9IN4jh">序号</th><th data-page-node-id="GfGOm290ECEjOk9eECISNj">学号</th><th data-page-node-id="kO0ZiMzuZIwkr8af7PfUDT">姓名</th>          <th data-page-node-id="nFzhwdRl561bY2NJBH81tS">累计得分</th><th data-page-node-id="lvth01">已通关卡</th><th data-page-node-id="WIa7VqIriso9PeaFC59Hk4">闯关次数</th>
+          <th data-page-node-id="CAsE3IQN5CKYfCVOPZdZvm">成功次数</th><th data-page-node-id="ezwYb4gvzdG44Rd9xydePl">平均正确率</th><th data-page-node-id="J9yA7KNQSkzS1zbJY8KwaO">最近闯关时间</th><th data-page-node-id="ErTpzhZ2g5XJaoOP9Fs7Ub">明细</th>
+        </tr></thead>
+        <tbody id="tbody" data-page-node-id="Du1gLUMzEUtP1KgSqtF2HZ"></tbody>
+      </table>
+    </div>
+    <p class="hint" data-page-node-id="wZRp8EhAXuoPN6HCsALLiA">点击表头可排序，点击"明细"可展开该生每次闯关记录（时间 / 玩法 / 视图 / 正确题数 / 正确率 / 是否加分）。</p>
+    <input type="file" id="fileInput" accept=".json,application/json" style="display:none" data-page-node-id="vpdRX6ZB73P7Y05xWnEmrl">
+  </div>
+</div>
+
+<div class="mask hide" id="srMask" data-page-node-id="sr0001">
+  <div class="sheet wide" data-page-node-id="sr0002">
+    <h2 data-page-node-id="sr0003">定子 · 转子 辨析</h2>
+    <div class="sub" data-page-node-id="sr0004">直流电机分两大阵营：固定不动的<strong style="color:#0ea5e9">定子</strong>与随轴旋转的<strong style="color:#f59e0b">转子</strong>。点下方部件名可在右侧图上高亮定位。</div>
+    <div id="srBody" data-page-node-id="sr0005"></div>
+    <p class="hint" data-page-node-id="sr0006">记忆口诀：① 看动不动——随轴转=转子，固定=定子；② 看位置——中心/轴上=转子，外围/机座内壁=定子；③ 看角色——建磁场、接线、支承=定子，能量转换、出力=转子。</p>
+    <div class="opts"><button class="opt" id="closeSR" data-page-node-id="sr0007">关闭</button></div>
+  </div>
+</div>
+
+<div class="flash" id="flash" data-page-node-id="nTm4honsFONsRLlsADq9l6"></div>
+<p class="foot" data-page-node-id="DLMrpIZ8L6x2RdqcdGOznc">
+  玩法：①<kbd data-page-node-id="NziJ3jqfZA6RiHlXDRR93J">自由探索</kbd>点部件学名称与作用（不计分）；②<kbd data-page-node-id="ZFNF9mqreUk8HROKiOVKXD">看名找件</kbd>按名称点出部件（15 秒/题）；
+  ③<kbd data-page-node-id="0jiGI0mcb6O9pHFkEvQX8W">看件知名</kbd>看高亮部件四选一；④<kbd data-page-node-id="ELBgWivM2rMHMu9WSZ4EWg">拖拽标注</kbd>把名称拖到图上。完成任意一种玩法的一整轮即计为一次闯关。
+  顶部「<kbd data-page-node-id="sr0008">定子·转子辨析</kbd>」可查看定子/转子判定要点与部件归类，点部件名可在图上高亮。
+</p>
+
+<script>
+/* ===================== 一、部件知识库 ===================== */
+const PARTS = {
+  cross: [
+    {id:'frame', name:'机座（磁轭）', color:'#64748b', type:'stator',
+     role:'电机的"外壳与骨架"：固定主磁极、换向极和端盖，支撑整机；同时是磁路的一部分，磁通从机座中通过。',
+     tip:'记"又当骨架、又走磁通"——铸铁/钢板制成，又厚又重。'},
+    {id:'mainPole', name:'主磁极（含极靴）', color:'#94a3b8', type:'stator',
+     role:'由极身与极靴组成，励磁绕组套在极身上，通电后建立主磁场；极靴使气隙磁通分布更均匀，并支撑励磁绕组。',
+     tip:'N、S 极必须交替排列，主磁极对数成对出现。'},
+    {id:'fieldWinding', name:'励磁绕组', color:'#c2740a', type:'stator',
+     role:'套在主磁极极身上的铜线圈，通入直流励磁电流后产生主磁通，是"建立磁场的源头"。',
+     tip:'串励匝少线粗、并励匝多线细——看线径就能判断励磁方式。'},
+    {id:'interPole', name:'换向极（附加极）', color:'#7e8ca3', type:'stator',
+     role:'装在主磁极之间的几何中性线上，用来改善换向、抑制电刷下的火花。',
+     tip:'"小个子"：比主磁极窄小，个数常等于主磁极数（小容量电机可减半）。'},
+    {id:'interWinding', name:'换向极绕组', color:'#b45309', type:'stator',
+     role:'产生换向磁动势，抵消电枢反应与电抗电动势，使被换向元件中的电流顺利改变方向。',
+     tip:'必须是"串联"——与电枢绕组串在一起，随电枢电流变化。'},
+    {id:'armCore', name:'电枢铁芯', color:'#8a94a6', type:'rotor',
+     role:'主磁路的组成部分，外圆开槽嵌放电枢绕组；由 0.5mm 硅钢片叠压而成以减小涡流损耗。',
+     tip:'"叠片+开槽"：为什么不用整块钢？为的是减小铁耗。'},
+    {id:'armWinding', name:'电枢绕组', color:'#b45309', type:'rotor',
+     role:'机电能量转换的核心：通电导体在磁场中受力产生电磁转矩；转动时又感应电动势，是电机的"心脏"。',
+     tip:'感应电动势 E=Ce·Φ·n，电磁转矩 T=CT·Φ·Ia——都与它有关。'},
+    {id:'shaft', name:'转轴', color:'#475569', type:'rotor',
+     role:'支撑电枢转子、传递机械转矩，并带动风扇等附件旋转。',
+     tip:'一根通长的钢轴，输出机械能的唯一通道。'},
+    {id:'airGap', name:'气隙', color:'#f1d9a7', type:'gap',
+     role:'电枢与极靴之间的空气层，是磁路中磁阻最大的部分；气隙越小，建立同样磁通所需励磁磁动势越小。',
+     tip:'越小越省磁动势，但太小会"扫膛"——一般 0.5～3mm。'}
+  ],
+  axial: [
+    {id:'frame', name:'机座', color:'#64748b', type:'stator',
+     role:'整机支撑与保护外壳，同时构成定子磁路；剖面上看到的是上下两条机座壁与底脚。',
+     tip:'底脚用来安装固定，机座上加出线盒。'},
+    {id:'mainPole', name:'主磁极', color:'#94a3b8', type:'stator',
+     role:'沿轴向叠成，固定在机座内壁上，与电枢铁芯之间留有均匀气隙。',
+     tip:'沿轴看是"贴在机座内壁上的一长条"。'},
+    {id:'fieldWinding', name:'励磁绕组', color:'#c2740a', type:'stator',
+     role:'套装在主磁极上，通入直流电建立主磁场。',
+     tip:'绕组端部要绑扎固定，检修时重点看绝缘。'},
+    {id:'armCore', name:'电枢铁芯', color:'#8a94a6', type:'rotor',
+     role:'转子磁路主体，轴向有通风孔，表面冲槽嵌放绕组。',
+     tip:'硅钢片叠压 + 轴向通风孔 = 散热又降损耗。'},
+    {id:'armWinding', name:'电枢绕组端部', color:'#b45309', type:'rotor',
+     role:'槽内导体伸出铁芯两端后的连接部分，起电气连接与形成回路的作用。',
+     tip:'端部用绑线或无纬带扎紧，离心力全靠它扛。'},
+    {id:'commutator', name:'换向器', color:'#b45309', type:'rotor',
+     role:'由许多楔形换向片（云母片绝缘）组成，与电刷配合实现机械整流，把电枢内部的交流变成外电路的直流（电动机反之）。',
+     tip:'"直流电机的身份证"——有换向器才叫直流电机。'},
+    {id:'brush', name:'电刷', color:'#334155', type:'stator',
+     role:'与换向器滑动接触，把外电路电流引入（电动机）或引出（发电机）电枢绕组。',
+     tip:'石墨/电化石墨制成，装在刷握里靠弹簧压在换向器表面。'},
+    {id:'brushHolder', name:'刷握与刷架', color:'#94a3b8', type:'stator',
+     role:'刷握固定电刷位置并提供适当压力，刷架把各刷握连成一体并固定在端盖（或机座）上。',
+     tip:'压力过大磨损快、过小火花大——检修常调这个。'},
+    {id:'endCover', name:'端盖', color:'#64748b', type:'stator',
+     role:'装在机座两端，通过轴承支撑转子，同时封闭防护、支撑刷架。',
+     tip:'拆装时先拆端盖，记住"前端盖（轴伸端）与后端盖"别装反。'},
+    {id:'bearing', name:'轴承', color:'#cbd5e1', type:'stator',
+     role:'支撑转轴高速旋转，承受径向与轴向力，减小摩擦损耗。',
+     tip:'运行中"听声音、测温度、看润滑"是点检三项。'},
+    {id:'shaft', name:'转轴', color:'#475569', type:'rotor',
+     role:'贯穿整机，一端为轴伸输出转矩，另一端带动风扇。',
+     tip:'轴伸端是输出端，联轴器就装在这头。'},
+    {id:'fan', name:'风扇', color:'#94a3b8', type:'rotor',
+     role:'装在转轴非换向器端，随转子旋转产生风量，对电机进行强迫通风冷却。',
+     tip:'自扇冷却：转速低时风量小，所以低速大转矩时要另加风机。'},
+    {id:'terminalBox', name:'出线盒', color:'#64748b', type:'stator',
+     role:'安装在机座上，内部为接线板，把电枢、励磁等绕组引线集中引出，方便连接外部电源。',
+     tip:'接线前先看清出线端标志：A1/A2（电枢）、D1/D2（串励）、E1/E2（并励）。'}
+  ]
+};
+const TYPE_NAME = {stator:'定子', rotor:'转子', gap:'气隙'};
+const TYPE_COLOR = {stator:'#0ea5e9', rotor:'#f59e0b', gap:'#94a3b8'};
+const partsByType = t => Object.keys(PARTS).flatMap(v=>PARTS[v].filter(p=>p.type===t))
+  .filter((p,i,a)=> a.findIndex(x=>x.id===p.id)===i);   // 去重（cross/axial 同名部件）
+const VIEW_INFO = {
+  cross:{title:'直流电机径向横剖面（定子 + 转子）', legend:'定子：机座、主磁极、换向极　转子：电枢铁芯、电枢绕组、转轴', vb:'-30 -30 620 620'},
+  axial:{title:'直流电机沿轴纵剖图（轴上部件）',   legend:'换向器、电刷、端盖、轴承、风扇、出线盒一览', vb:'0 0 620 410'}
+};
+const MODE_NAME = {explore:'自由探索', find:'看名找件', quiz:'看件知名', drag:'拖拽标注'};
+
+/* 关卡配置：难度逐级递增（题量↑ / 每题限时↓ / 提示↓ / 视图由横剖面转纵剖面）；通关线统一为 100%（全对） */
+const LEVELS = [
+  {lv:1, name:'入门 · 五大件起步', view:'cross', mode:'find', sec:30, pass:100, hint:true,  labels:false, star:1,
+   parts:['frame','mainPole','fieldWinding','armCore','shaft'],
+   rule:'只考最"大块"的 5 个部件，每题 30 秒、给文字提示，必须全部答对（正确率 100%）才能通过'},
+  {lv:2, name:'进阶 · 横剖面全览', view:'cross', mode:'find', sec:20, pass:100, hint:false, labels:false, star:2,
+   parts:null,
+   rule:'横剖面 9 个部件全部要找，每题 20 秒，必须全部答对（正确率 100%）才能通过'},
+  {lv:3, name:'反练 · 见件能知名', view:'cross', mode:'quiz', sec:15, pass:100, hint:true,  labels:false, star:3,
+   parts:null,
+   rule:'改为"看图选名"四选一，考的是反记忆，每题 15 秒，必须全部答对（正确率 100%）才能通过'},
+  {lv:4, name:'换位 · 纵剖面十三件', view:'axial', mode:'find', sec:12, pass:100, hint:false, labels:false, star:4,
+   parts:null,
+   rule:'换到沿轴剖视图，13 个部件逐一指认，无提示、每题仅 12 秒，必须全部答对（正确率 100%）才能通过'},
+  {lv:5, name:'终极 · 限时全图标注', view:'axial', mode:'drag', sec:240, pass:100, hint:false, labels:false, star:5,
+   parts:null,
+   rule:'终局：4 分钟内把 13 个名称全部拖到图上正确位置，必须全部答对（正确率 100%）才能通过'}
+];
+const levelOf = lv => LEVELS.find(x=>x.lv===lv) || null;
+
+/* ===================== 二、SVG 绘图 ===================== */
+const CX = 280, CY = 280;
+const P = (r,a)=>[CX + r*Math.cos(a*Math.PI/180), CY + r*Math.sin(a*Math.PI/180)];
+const F = n => Math.round(n*10)/10;
+function ring(r1, r2){
+  return `M${CX-r2},${CY} A${r2},${r2} 0 1,0 ${CX+r2},${CY} A${r2},${r2} 0 1,0 ${CX-r2},${CY} Z `
+       + `M${CX-r1},${CY} A${r1},${r1} 0 1,1 ${CX+r1},${CY} A${r1},${r1} 0 1,1 ${CX-r1},${CY} Z`;
+}
+function sector(rIn, rOut, a0, a1){
+  const [x1,y1]=P(rOut,a0), [x2,y2]=P(rOut,a1), [x3,y3]=P(rIn,a1), [x4,y4]=P(rIn,a0);
+  return `M${F(x1)},${F(y1)} A${rOut},${rOut} 0 0,1 ${F(x2)},${F(y2)} L${F(x3)},${F(y3)} A${rIn},${rIn} 0 0,0 ${F(x4)},${F(y4)} Z`;
+}
+function rect(x,y,w,h,r){ return `<rect class="p" x="${x}" y="${y}" width="${w}" height="${h}" rx="${r||0}"/>`; }
+function coil(r1, r2, off, w){
+  const x = CX + r1, y = CY + off - w/2, wd = r2 - r1;
+  let s = `<rect class="p" x="${F(x)}" y="${F(y)}" width="${wd}" height="${w}" rx="3"/>`;
+  for(let i=0;i<5;i++){
+    const cx = F(x + wd*(0.13 + 0.185*i));
+    s += `<circle class="wire" cx="${cx}" cy="${F(y+w*0.3)}" r="2.5"/><circle class="wire" cx="${cx}" cy="${F(y+w*0.7)}" r="2.5"/>`;
+  }
+  return s;
+}
+const label = (x,y,txt,anchor)=>`<text class="lbl" x="${x}" y="${y}" text-anchor="${anchor||'middle'}">${txt}</text>`;
+
+function buildCross(){
+  const MAIN=[270,0,90,180], INTER=[315,45,135,225];
+  let s = '';
+  s += `<g data-part="frame" style="--c:#64748b">` + rect(180,516,100,34,5) + rect(280,516,100,34,5)
+     + `<path class="p" d="${ring(212,252)}" fill-rule="evenodd"/></g>`;
+  let core='', coilStr='';
+  MAIN.forEach(a=>{
+    core += `<g transform="rotate(${a} ${CX} ${CY})">`
+          + `<path class="p" d="M${CX+158},${CY-34} L${CX+212},${CY-34} L${CX+212},${CY+34} L${CX+158},${CY+34} Z"/>`
+          + `<path class="p" d="${sector(132,158,-24,24)}"/></g>`;
+    coilStr += `<g transform="rotate(${a} ${CX} ${CY})">${coil(170,205,42,16)}${coil(170,205,-42,16)}</g>`;
+  });
+  s += `<g data-part="mainPole" style="--c:#94a3b8">${core}</g>`;
+  s += `<g data-part="fieldWinding" style="--c:#c2740a">${coilStr}</g>`;
+  let ic='', iw='';
+  INTER.forEach(a=>{
+    ic += `<g transform="rotate(${a} ${CX} ${CY})">`
+        + `<path class="p" d="M${CX+190},${CY-17} L${CX+212},${CY-17} L${CX+212},${CY+17} L${CX+190},${CY+17} Z"/>`
+        + `<path class="p" d="${sector(174,190,-12,12)}"/></g>`;
+    iw += `<g transform="rotate(${a} ${CX} ${CY})">${coil(194,207,25,11)}${coil(194,207,-25,11)}</g>`;
+  });
+  s += `<g data-part="interPole" style="--c:#7e8ca3">${ic}</g>`;
+  s += `<g data-part="interWinding" style="--c:#b45309">${iw}</g>`;
+  let holes='';
+  for(let i=0;i<8;i++){ const [hx,hy]=P(74,i*45); holes += `<circle class="wire" cx="${F(hx)}" cy="${F(hy)}" r="7"/>`; }
+  s += `<g data-part="armCore" style="--c:#8a94a6"><circle class="p" cx="${CX}" cy="${CY}" r="126"/><circle class="p" cx="${CX}" cy="${CY}" r="108"/>${holes}</g>`;
+  let slots='';
+  for(let i=0;i<24;i++){ slots += `<path class="p" d="${sector(112,124,i*15-4.2,i*15+4.2)}"/>`; }
+  s += `<g data-part="armWinding" style="--c:#b45309">${slots}</g>`;
+  s += `<g data-part="airGap" style="--c:#f1d9a7"><path class="p" d="${ring(126,133)}" fill-rule="evenodd"/></g>`;
+  s += `<g data-part="shaft" style="--c:#475569"><circle class="p" cx="${CX}" cy="${CY}" r="26"/>`
+     + `<rect class="p" x="${CX-4}" y="${CY-30}" width="8" height="9" rx="2"/></g>`;
+  s += `<g class="labels">` + label(280,46,'机座（磁轭）') + label(280,100,'主磁极铁芯') + label(196,96,'励磁绕组','end')
+     + label(466,452,'换向极') + label(505,404,'换向极绕组') + label(280,238,'电枢铁芯') + label(280,406,'电枢绕组')
+     + label(280,286,'转轴') + label(392,196,'气隙') + `</g>`;
+  return s;
+}
+function buildAxial(){
+  const AX = 210; let s = '';
+  s += `<g data-part="frame" style="--c:#64748b">` + rect(76,56,490,28,4) + rect(76,336,490,28,4)
+     + rect(140,364,80,26,4) + rect(420,364,80,26,4) + `</g>`;
+  s += `<g data-part="terminalBox" style="--c:#64748b">` + rect(388,26,62,30,4)
+     + `<rect class="segline" x="398" y="36" width="42" height="10" rx="2"/></g>`;
+  let pole='', fw='';
+  pole += rect(268,84,52,48,2) + rect(250,132,88,18,3) + rect(268,288,52,48,2) + rect(250,270,88,18,3);
+  fw += rect(252,88,18,40,3) + rect(318,88,18,40,3) + rect(252,292,18,40,3) + rect(318,292,18,40,3);
+  s += `<g data-part="mainPole" style="--c:#94a3b8">${pole}</g>`;
+  s += `<g data-part="fieldWinding" style="--c:#c2740a">${fw}</g>`;
+  let lam='';
+  for(let x=232;x<428;x+=14){ lam += `<line class="lam" x1="${x}" y1="152" x2="${x}" y2="268" />`; }
+  s += `<g data-part="armCore" style="--c:#8a94a6">${rect(222,150,208,120,4)}${lam}</g>`;
+  s += `<g data-part="armWinding" style="--c:#b45309">` + rect(182,140,42,140,18) + rect(428,140,42,140,18) + `</g>`;
+  s += `<g data-part="shaft" style="--c:#475569">${rect(50,AX-14,520,28,4)}</g>`;
+  s += `<g data-part="endCover" style="--c:#64748b">${rect(76,56,26,308,4)}${rect(540,56,26,308,4)}</g>`;
+  s += `<g data-part="bearing" style="--c:#cbd5e1">${rect(102,184,26,52,3)}${rect(514,184,26,52,3)}</g>`;
+  let blades='';
+  for(let i=0;i<6;i++){ blades += `<rect class="p" x="155" y="${AX-5}" width="30" height="10" rx="5" transform="rotate(${i*60} 155 ${AX})"/>`; }
+  s += `<g data-part="fan" style="--c:#94a3b8">${blades}<circle class="p" cx="155" cy="${AX}" r="9"/></g>`;
+  let segs='';
+  for(let i=0;i<9;i++){ segs += `<rect class="segline" x="${479+i*3.7}" y="168" width="1.8" height="84"/>`; }
+  s += `<g data-part="commutator" style="--c:#b45309">${rect(478,166,34,88,4)}${segs}</g>`;
+  s += `<g data-part="brush" style="--c:#334155">${rect(486,142,20,26,2)}${rect(486,252,20,26,2)}</g>`;
+  s += `<g data-part="brushHolder" style="--c:#94a3b8">` + rect(478,128,42,14,3) + rect(478,268,42,14,3) + rect(468,128,8,154,3) + `</g>`;
+  s += `<path class="lead" d="M336,108 C360,80 380,70 404,58" />`;
+  s += `<g class="labels">` + label(170,76,'机座') + label(419,20,'出线盒') + label(294,116,'主磁极') + label(232,74,'励磁绕组','end')
+     + label(326,196,'电枢铁芯') + label(203,124,'电枢绕组端部') + label(449,124,'电枢绕组端部') + label(300,AX+5,'转轴')
+     + label(60,300,'端盖') + label(115,172,'轴承') + label(155,144,'风扇') + label(495,306,'换向器')
+     + label(452,118,'电刷','end') + label(540,112,'刷握/刷架') + `</g>`;
+  return s;
+}
+
+/* ===================== 三、数据层（学生档案 / 闯关记录） ===================== */
+const DB_KEY = 'dc_motor_quest_db_v1';
+const CAP = 1;          // 单名学生累计得分上限（5 关全过记 1 分）
+const PASS_RATE = 100;  // 闯关成功正确率阈值（统一为全对）
+let memDB = {};         // localStorage 不可用时的内存兜底
+
+function loadDB(){
+  try{
+    const raw = localStorage.getItem(DB_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return memDB;
+}
+function saveDB(db){
+  try{ localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+  catch(e){ memDB = db; }
+}
+let DB = loadDB();
+/* 旧档案补齐闯关字段（cleared / best），并按原积分等价解锁前 N 关 */
+function ensureCleared(s){
+  if(!s.cleared){
+    s.cleared = {};
+    // 旧规则数据迁移：原 5 分即视为 5 关全过；其余按未通关重新累计
+    if((s.score||0) >= LEVELS.length){ for(let i=1;i<=LEVELS.length;i++) s.cleared[i] = true; s.score = 1; }
+    else { s.score = 0; }
+  }
+  if(!s.best) s.best = {};
+  if(!s.fails) s.fails = {};
+  return s;
+}
+(function migrateDB(){
+  let dirty = false;
+  Object.values(DB).forEach(s=>{ if(!s.cleared || !s.best){ ensureCleared(s); dirty = true; } });
+  if(dirty) saveDB(DB);
+})();
+const clearedList = s => Object.keys(s.cleared||{}).map(Number).sort((a,b)=>a-b);
+const maxCleared  = s => clearedList(s).reduce((a,b)=>Math.max(a,b), 0);
+// 已通关的最高关 + 1 = 当前可挑战关卡
+const unlockedLevel = s => Math.min(maxCleared(s) + 1, LEVELS.length);
+
+const nowStr = ()=>{
+  const d = new Date(), p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+};
+function getStudent(sid){ return DB[sid] ? ensureCleared(DB[sid]) : null; }
+function touchStudent(sid, name){
+  let s = DB[sid];
+  if(!s){
+    s = DB[sid] = {sid, name, score:0, attempts:0, success:0, firstTime:nowStr(), lastTime:'', history:[], cleared:{}, best:{}, fails:{}};
+  }
+  ensureCleared(s);
+  s.name = name;          // 以学号为准，姓名更新
+  saveDB(DB);
+  return s;
+}
+// 记录一次闯关：返回 {gained, capped, repeat, demoted}
+function recordRound(stu, info){
+  stu.attempts++;
+  stu.lastTime = info.time;
+  stu.fails = stu.fails || {};
+  let gained = 0, capped = false, repeat = false, demoted = false;
+  const lv = info.level || 0;
+  if(lv) stu.best[lv] = Math.max(stu.best[lv] || 0, info.rate);
+  if(info.pass){
+    if(lv) stu.fails[lv] = 0;               // 通过则清零该关失败次数
+    stu.success++;
+    if(lv && !stu.cleared[lv]){
+      stu.cleared[lv] = true;
+      const allClear = LEVELS.every(L => stu.cleared[L.lv]);
+      if(allClear && stu.score < CAP){ stu.score = CAP; gained = 1; }   // 集齐 5 关才记 1 分
+      else { repeat = true; }                                           // 仅本关通过、未满 5 关，不加分
+    }else{
+      repeat = true;                        // 本关此前已通关，重玩不加分
+    }
+  }else if(lv){                             // 本关未通过
+    stu.fails[lv] = (stu.fails[lv] || 0) + 1;
+    if(stu.fails[lv] >= 2){                 // 同一关连败两次 → 退回第 1 关、成绩清零
+      stu.cleared = {}; stu.score = 0; stu.fails = {}; stu.best = {};
+      demoted = true;
+    }
+  }
+  stu.history.push({
+    t: info.time, level: lv, mode: info.mode, view: info.view,
+    right: info.right, total: info.total, rate: info.rate, pass: info.pass, gained
+  });
+  if(stu.history.length > 200) stu.history = stu.history.slice(-200);
+  saveDB(DB);
+  return {gained, capped, repeat, demoted};
+}
+const avgRate = s => s.history.length
+  ? Math.round(s.history.reduce((a,b)=>a+b.rate,0)/s.history.length) : 0;
+
+/* ===================== 四、游戏状态 ===================== */
+const svg = document.getElementById('motor');
+const panel = document.getElementById('panel');
+const flashEl = document.getElementById('flash');
+const S = {
+  stu: null, view:'cross', mode:'map', level:0, isTeacher:false,
+  score:0, combo:0, queue:[], idx:0, right:0, wrong:[],
+  timer:null, left:0, total:15, locked:false, startAt:0, done:new Set()
+};
+const partsOf = v => PARTS[v];
+const byId = (v,id)=>PARTS[v].find(p=>p.id===id);
+const curLevel = ()=> S.level ? levelOf(S.level) : null;
+const secOf    = ()=> (curLevel() ? curLevel().sec  : 15);
+const passOf   = ()=> (curLevel() ? curLevel().pass : PASS_RATE);
+const showHint = ()=> (curLevel() ? !!curLevel().hint : true);
+function shuffle(a){ const b=a.slice(); for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]];} return b; }
+
+function renderSVG(){
+  svg.setAttribute('viewBox', VIEW_INFO[S.view].vb);
+  svg.innerHTML = S.view === 'cross' ? buildCross() : buildAxial();
+  document.getElementById('viewTitle').textContent = VIEW_INFO[S.view].title;
+  document.getElementById('viewLegend').textContent = VIEW_INFO[S.view].legend;
+}
+const gp = id => svg.querySelector(`g[data-part="${id}"]`);
+function clearMarks(){ svg.querySelectorAll('g[data-part]').forEach(g=>g.classList.remove('hl','ok','no','pulse')); }
+function mark(id, cls, ms){ const g=gp(id); if(!g) return; g.classList.add(cls); if(ms) setTimeout(()=>g.classList.remove(cls), ms); }
+function flash(txt, ok){
+  flashEl.textContent = txt; flashEl.className = 'flash show ' + (ok?'ok':'no');
+  clearTimeout(flashEl._t);
+  flashEl._t = setTimeout(()=>{ flashEl.className='flash '+(ok?'ok':'no'); }, 1200);
+}
+function updateHUD(){
+  const s = S.stu; if(!s) return;
+  document.getElementById('hudRole').textContent = S.isTeacher ? '教师' : '学生';
+  document.getElementById('hudName').textContent = s.name;
+  document.getElementById('hudSid').textContent = s.sid;
+  document.getElementById('hudScore').textContent = `${s.score} / ${CAP}`;
+  document.getElementById('hudTimes').textContent = s.attempts;
+  const hl = document.getElementById('hudLevel');
+  if(hl) hl.textContent = `${clearedList(s).length} / ${LEVELS.length}`;
+}
+
+/* ===================== 五、模式与题目 ===================== */
+function renderPanel(){
+  clearInterval(S.timer); clearTimeout(S.timer); S.locked = false;
+  if(S.mode==='explore') return renderExplore();
+  if(S.mode==='map')     return renderLevels();
+  if(S.mode==='find')    return renderFind();
+  if(S.mode==='quiz')    return renderQuiz();
+  if(S.mode==='drag')    return renderDrag();
+}
+function resetRound(){
+  S.score=0; S.combo=0; S.idx=0; S.right=0; S.wrong=[];
+  const L = curLevel();
+  let pool = partsOf(S.view);
+  if(L && L.parts) pool = pool.filter(p => L.parts.includes(p.id));
+  S.queue = shuffle(pool);
+  S.startAt = Date.now();
+}
+/* ---------- 关卡地图 ---------- */
+function renderLevels(){
+  clearMarks();
+  const s = S.stu;
+  const open = s ? unlockedLevel(s) : 1;
+  const done = s ? clearedList(s) : [];
+  panel.innerHTML = `
+    <span class="badge">闯关模式 · 共 ${LEVELS.length} 关，难度逐级升高</span>
+    <div class="lv-top">5 关全部通过记 <b>1 分</b>（最高 ${CAP} 分）；集齐全部关卡才计分，已通关的关卡可重练但不重复加分。<br>
+      当前进度：<b>${done.length} / ${LEVELS.length}</b> 关　可挑战：<b>第 ${open} 关</b>　累计积分：<b>${s ? s.score : 0} / ${CAP}</b></div>
+    <div class="lv-list">
+      ${LEVELS.map(L=>{
+        const passed = done.includes(L.lv);
+        const locked = L.lv > open;
+        const best = s && s.best && s.best[L.lv] ? s.best[L.lv] + '%' : '—';
+        const cls = passed ? 'done' : (locked ? 'lock' : 'cur');
+        return `
+        <div class="lv-card ${cls}">
+          <div class="lv-no">${passed ? '✓' : L.lv}</div>
+          <div class="lv-main">
+            <b>第 ${L.lv} 关 · ${L.name}</b><span class="lv-tag">${MODE_NAME[L.mode]}</span><span class="lv-tag">${L.view==='cross'?'横剖面':'纵剖面'}</span>
+            <div class="lv-meta">难度 <span class="star">${'★'.repeat(L.star)}${'☆'.repeat(LEVELS.length-L.star)}</span> ｜ 通过线 ${L.pass}% ｜ ${L.mode==='drag' ? '总限时 ' + L.sec + ' 秒' : '每题 ' + L.sec + ' 秒'}${L.hint ? ' ｜ 有提示' : ' ｜ 无提示'}${L.labels ? ' ｜ 图上显示名称' : ''}<br>${L.rule}</div>
+            <div class="lv-meta">本关最佳正确率：<b>${best}</b>${passed ? ' ｜ 状态：已通关' : (locked ? ' ｜ 状态：未解锁（需先通过第 ' + (L.lv-1) + ' 关）' : ' ｜ 状态：可挑战')}</div>
+          </div>
+          <div class="lv-btn">
+            <button class="${locked ? '' : 'primary'}" data-lv="${L.lv}" ${locked ? 'disabled' : ''}>${passed ? '再练一次' : (locked ? '未解锁' : '开始挑战')}</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <p class="hint">建议顺序：第 1 关认大件 → 第 2 关补全横剖面 → 第 3 关反向识名 → 第 4 关转纵剖面 → 第 5 关限时全图标注。想先看图学习可切到「练习模式」。</p>`;
+  panel.querySelectorAll('.lv-btn button').forEach(b=> b.onclick = ()=> startLevel(Number(b.dataset.lv)));
+}
+function startLevel(lv){
+  const L = levelOf(lv); if(!L || !S.stu) return;
+  if(lv > unlockedLevel(S.stu)){ flash('请先通过第 ' + (lv-1) + ' 关', false); return; }
+  S.level = lv; S.view = L.view; S.mode = L.mode;
+  document.body.classList.remove('showlabels');   // 闯关模式一律隐藏部件名称
+  document.querySelectorAll('#viewSeg button').forEach(x=> x.classList.toggle('active', x.dataset.view === L.view));
+  S.done = new Set(); resetRound(); renderSVG(); renderPanel(); syncModeButtons();
+  if(L.mode === 'drag') startTimer(L.sec, ()=>{ flash('⏰ 时间到，本关结束', false); roundDone(); });
+  flash('第 ' + lv + ' 关开始：' + L.name, true);
+}
+function renderExplore(){
+  clearMarks();
+  panel.innerHTML = `
+    <span class="badge">模式一 · 自由探索（练习，不计分）</span>
+    <div class="card-info" style="margin-top:10px">
+      <h3>点一点，认识每一个部件</h3>
+      <p class="role" style="color:var(--muted)">在左侧图上点击任意部件，这里显示名称、作用与记忆要点。准备好后切到"闯关模式"从第 1 关开始挑战。</p>
+      <div class="tip">本视图共 ${partsOf(S.view).length} 个部件，全部点过一遍再闯关效果更好。</div>
+    </div>`;
+}
+function renderFind(){
+  if(!S.queue.length) resetRound();
+  clearMarks();
+  if(S.idx >= S.queue.length) return roundDone();
+  const L = curLevel();
+  const p = S.queue[S.idx];
+  panel.innerHTML = `
+    <span class="badge">${L ? '第 '+L.lv+' 关 · '+L.name : '看名找件'}</span>
+    <div class="q-name">${p.name}</div>
+    ${showHint() ? `<div class="q-tip">提示：${p.role.split('：')[0]}。${p.tip}</div>` : ''}
+    <div class="timer" id="tm"><i></i></div>
+    <div class="stats">
+      <div class="stat"><b>${S.idx+1}/${S.queue.length}</b><span>题号</span></div>
+      <div class="stat"><b>${S.score}</b><span>本关得分</span></div>
+      <div class="stat"><b>${S.combo}</b><span>连击</span></div>
+    </div>
+    <p class="hint">在左侧图中<strong>点击</strong>该部件位置。本关需全部答对（正确率 100%）才能通关，每关 2 次机会。</p>`;
+  startTimer(secOf(), ()=>answerFind(null, true));
+}
+function startTimer(sec, onEnd){
+  clearInterval(S.timer); S.left = sec; S.total = sec;
+  const bar = document.querySelector('#tm i'); if(bar) bar.style.width = '100%';
+  S.timer = setInterval(()=>{
+    S.left -= 0.1;
+    const b = document.querySelector('#tm i'), box = document.querySelector('#tm');
+    if(b) b.style.width = Math.max(0, S.left/S.total*100) + '%';
+    if(box) box.classList.toggle('low', S.left <= 5);
+    if(S.left <= 0){ clearInterval(S.timer); onEnd(); }
+  }, 100);
+}
+function answerFind(id, timeout){
+  if(S.locked) return;
+  S.locked = true; clearInterval(S.timer);
+  const p = S.queue[S.idx];
+  if(id === p.id){
+    S.combo++; S.right++; S.score += 10 + (S.combo-1)*2;
+    mark(id,'ok'); flash('✅ 正确！+' + (10 + (S.combo-1)*2), true);
+    setTimeout(()=>{ S.idx++; S.locked=false; renderFind(); }, 700);
+  }else{
+    S.combo = 0; S.wrong.push(p);
+    if(id) mark(id,'no',600);
+    mark(p.id,'ok',1600);
+    flash(timeout ? '⏰ 超时！正确答案已高亮' : '❌ 不对，绿色是正确位置', false);
+    setTimeout(()=>{ S.idx++; S.locked=false; renderFind(); }, 1500);
+  }
+}
+function renderQuiz(){
+  if(!S.queue.length) resetRound();
+  clearMarks();
+  if(S.idx >= S.queue.length) return roundDone();
+  const L = curLevel();
+  const p = S.queue[S.idx];
+  mark(p.id,'pulse');
+  const others = shuffle(partsOf(S.view).filter(x=>x.id!==p.id)).slice(0,3);
+  panel.innerHTML = `
+    <span class="badge">${L ? '第 '+L.lv+' 关 · '+L.name : '看件知名'}</span>
+    <div class="q-name" style="font-size:17px">左侧闪烁的部件叫什么？</div>
+    ${showHint() ? `<div class="q-tip">提示：${p.tip}</div>` : ''}
+    <div class="opts">${shuffle([p,...others]).map(o=>`<button class="opt" data-id="${o.id}">${o.name}</button>`).join('')}</div>
+    <div class="timer" id="tm"><i></i></div>
+    <div class="stats">
+      <div class="stat"><b>${S.idx+1}/${S.queue.length}</b><span>题号</span></div>
+      <div class="stat"><b>${S.score}</b><span>本关得分</span></div>
+      <div class="stat"><b>${S.combo}</b><span>连击</span></div>
+    </div>`;
+  panel.querySelectorAll('.opt').forEach(b=> b.onclick = ()=>answerQuiz(b.dataset.id, b));
+  startTimer(secOf(), ()=>answerQuiz(null, null));
+}
+function answerQuiz(id, btn){
+  if(S.locked) return;
+  S.locked = true; clearInterval(S.timer);
+  const p = S.queue[S.idx]; clearMarks();
+  panel.querySelectorAll('.opt').forEach(b=>{ b.disabled = true; if(b.dataset.id===p.id) b.classList.add('ok'); });
+  if(id === p.id){
+    S.combo++; S.right++; S.score += 10 + (S.combo-1)*2;
+    mark(p.id,'ok'); flash('✅ 正确！+' + (10 + (S.combo-1)*2), true);
+  }else{
+    S.combo = 0; S.wrong.push(p); if(btn) btn.classList.add('no');
+    mark(p.id,'ok'); flash('❌ 正确答案是：' + p.name, false);
+  }
+  setTimeout(()=>{ S.idx++; S.locked=false; renderQuiz(); }, 1400);
+}
+function renderDrag(){
+  clearMarks();
+  if(!S.queue.length) resetRound();
+  const L = curLevel();
+  const left = partsOf(S.view).filter(p => !S.done.has(p.id));
+  if(!left.length) return roundDone();
+  const total = partsOf(S.view).length;
+  panel.innerHTML = `
+    <span class="badge">${L ? '第 '+L.lv+' 关 · '+L.name : '拖拽标注'}</span>
+    <div class="q-name" style="font-size:17px">把名称拖到图上对应位置</div>
+    ${L ? '<div class="timer" id="tm"><i></i></div>' : ''}
+    <div class="tags">${shuffle(left).map(p=>`<div class="tag" data-id="${p.id}">${p.name}</div>`).join('')}</div>
+    <p class="hint">按住名称标签拖到左侧图上的部件再松手。放对变绿固定，本关需全部答对（正确率 100%）才能通关，每关 2 次机会。</p>
+    <div class="stats">
+      <div class="stat"><b>${total-left.length}/${total}</b><span>已标注</span></div>
+      <div class="stat"><b>${S.score}</b><span>本关得分</span></div>
+      <div class="stat"><b>${S.combo}</b><span>连击</span></div>
+    </div>`;
+  panel.querySelectorAll('.tag').forEach(t=> t.addEventListener('pointerdown', ev=>startDrag(ev, t)));
+}
+let ghost = null;
+function startDrag(ev, tag){
+  ev.preventDefault();
+  if(tag.classList.contains('done')) return;
+  ghost = document.createElement('div');
+  ghost.className = 'ghost-tag'; ghost.textContent = tag.textContent;
+  document.body.appendChild(ghost);
+  const move = e => { ghost.style.left = e.clientX+'px'; ghost.style.top = e.clientY+'px'; };
+  move(ev);
+  const up = e => {
+    document.removeEventListener('pointermove', move);
+    document.removeEventListener('pointerup', up);
+    ghost.remove(); ghost = null;
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const g = el && el.closest ? el.closest('g[data-part]') : null;
+    if(g && g.dataset.part === tag.dataset.id){
+      S.done.add(tag.dataset.id);
+      S.combo++; S.right++; S.score += 10 + (S.combo-1)*2;
+      tag.classList.add('done'); mark(tag.dataset.id,'ok',900);
+      flash('✅ ' + tag.textContent + ' 标注正确', true);
+      setTimeout(renderDrag, 500);
+    }else{
+      S.combo = 0; tag.classList.add('wrong');
+      const p = byId(S.view, tag.dataset.id); if(p) S.wrong.push(p);
+      if(g) mark(g.dataset.part,'no',700);
+      flash('❌ 位置不对，再想想', false);
+      setTimeout(()=>tag.classList.remove('wrong'), 500);
+    }
+  };
+  document.addEventListener('pointermove', move);
+  document.addEventListener('pointerup', up);
+}
+
+/* ===================== 六、一轮结束：计分与归档 ===================== */
+function roundDone(){
+  clearMarks(); clearInterval(S.timer);
+  const L = curLevel();
+  const total = S.mode === 'drag' ? partsOf(S.view).length : S.queue.length;
+  const right = S.right;
+  const rate  = total ? Math.round(right/total*100) : 0;
+  const need  = passOf();
+  const pass  = rate >= need;
+  const info  = {
+    time: nowStr(), level: L ? L.lv : 0,
+    mode: (L ? '第'+L.lv+'关·' : '') + MODE_NAME[S.mode],
+    view: S.view==='cross'?'横剖面':'纵剖面', right, total, rate, pass
+  };
+  const res = recordRound(S.stu, info);
+  pushRecord();                 // 同步成绩到云端（失败不阻塞）
+  updateHUD();
+  const demoted = res.demoted;
+
+  const sec  = Math.round((Date.now()-S.startAt)/1000);
+  const uniq = [...new Map(S.wrong.map(w=>[w.id,w])).values()];
+  const nextLv = L ? L.lv + 1 : 0;
+  const nextOpen = pass && nextLv <= LEVELS.length && !demoted;
+  const head = !pass
+    ? (demoted
+        ? `本关连续两次未通过，已退回第 1 关，成绩清零、从第一关重新挑战`
+        : `本关正确率 ${rate}% ＜ 通关线 ${need}%，未通过，还有 1 次机会，请再练一次`)
+    : (res.gained ? `🎉 恭喜！全部 ${LEVELS.length} 关通关，积分 +1！`
+      : (demoted ? `本关通过，但此前连败已退回第 1 关，需重新集齐 5 关`
+                 : `👍 第 ${L.lv} 关通过！已集齐 ${clearedList(S.stu).length}/${LEVELS.length} 关，集齐全部即可获得 1 分`));
+  panel.innerHTML = `
+    <div class="result">
+      <span class="badge">${L ? '第 '+L.lv+' 关 · '+L.name : MODE_NAME[S.mode]} · 本关结束</span>
+      <h3 style="margin-top:10px">${head}</h3>
+      <div class="score">${S.score}<span style="font-size:14px;color:var(--muted);font-weight:400"> 本关得分</span></div>
+      <p class="hint">答对 ${right}/${total} · 正确率 ${rate}%（通关线 ${need}%） · 用时 ${sec} 秒</p>
+      <div class="stats">
+        <div class="stat"><b>${S.stu.score} / ${CAP}</b><span>累计积分</span></div>
+        <div class="stat"><b>${clearedList(S.stu).length} / ${LEVELS.length}</b><span>已通关卡</span></div>
+        <div class="stat"><b>${S.stu.attempts}</b><span>累计闯关次数</span></div>
+      </div>
+      ${nextOpen ? `<div class="tip" style="background:var(--ok-soft);color:#14532d;border-radius:8px;padding:8px 10px;font-size:13px;margin-top:10px">🔓 已解锁第 ${nextLv} 关：${levelOf(nextLv).name}（${levelOf(nextLv).rule}）</div>` : ''}
+      ${res.capped ? `<div class="tip" style="background:var(--warn-soft);color:#78350f;border-radius:8px;padding:8px 10px;font-size:13px;margin-top:10px">你已集齐全部关卡，后续重玩不再重复加分。</div>` : ''}
+      ${uniq.length ? `<div class="wrongs"><div style="background:none;color:var(--muted);padding:0;cursor:default">仍需加强（点击可在图中定位）：</div>
+        ${uniq.map(w=>`<div data-id="${w.id}">${w.name} —— ${w.tip}</div>`).join('')}</div>` : ''}
+      <div class="opts">
+        ${nextOpen ? `<button class="opt" id="nextLv">挑战第 ${nextLv} 关 →</button>` : ''}
+        <button class="opt" id="again">${pass ? '再练一次本关' : '重新挑战本关'}</button>
+        <button class="opt" id="toMap">返回关卡地图</button>
+      </div>
+    </div>`;
+  const again = panel.querySelector('#again');
+  if(again) again.onclick = ()=>{
+    if(demoted){ startLevel(1); return; }
+    S.done = new Set(); resetRound(); renderPanel();
+    if(S.mode==='drag' && L) startTimer(L.sec, ()=>{ flash('⏰ 时间到，本关结束', false); roundDone(); });
+  };
+  panel.querySelector('#toMap').onclick = ()=>{ S.level = 0; S.mode='map'; S.done=new Set(); renderPanel(); syncModeButtons(); };
+  const nb = panel.querySelector('#nextLv');
+  if(nb) nb.onclick = ()=> startLevel(nextLv);
+  panel.querySelectorAll('.wrongs div[data-id]').forEach(d=> d.onclick = ()=>{ clearMarks(); mark(d.dataset.id,'pulse',3000); });
+  flash(res.gained ? '🎉 全部 ' + LEVELS.length + ' 关通关，积分 +1！' : (pass ? '本关通过，继续集齐 5 关' : '未达通关线，再练一次'), !!res.gained);
+}
+
+/* ===================== 七、图面交互 ===================== */
+svg.addEventListener('click', e=>{
+  const g = e.target.closest('g[data-part]'); if(!g) return;
+  const id = g.dataset.part, p = byId(S.view, id); if(!p) return;
+  if(S.mode === 'explore'){
+    clearMarks(); mark(id,'hl');
+    panel.innerHTML = `
+      <span class="badge">${S.view==='cross'?'横剖面':'纵剖面'} · 部件详情</span>
+      <div class="card-info"><h3>${p.name} <span class="type-badge" style="color:#fff;background:${TYPE_COLOR[p.type]||'#64748b'}">${TYPE_NAME[p.type]||''}</span></h3><p class="role">${p.role}</p>
+      <div class="tip">💡 记忆要点：${p.tip}</div>
+      <div class="tip" style="background:#f1f5f9;color:#334155">📌 归类：${p.type==='gap' ? '气隙是定子与转子之间的空气间隙，既不属于定子也不属于转子' : (p.type==='stator' ? '属于<strong>定子</strong>——固定不动，负责建立磁场、支承与接线' : '属于<strong>转子</strong>——随转轴旋转，是机电能量转换的核心')}。</div></div>
+      <div class="opts"><button class="opt" id="back">← 返回</button></div>`;
+    panel.querySelector('#back').onclick = renderExplore;
+  }else if(S.mode === 'find'){
+    answerFind(id);
+  }
+});
+
+/* ===================== 七·二、定子·转子辨析 ===================== */
+const srMask = document.getElementById('srMask');
+function openSR(){ renderSR(); srMask.classList.remove('hide'); }
+function closeSR(){ srMask.classList.add('hide'); clearMarks(); }
+function renderSR(){
+  const group = t => partsByType(t).map(p=> p.type==='gap'
+      ? `<span class="sr-chip" style="--c:${TYPE_COLOR.gap}">${p.name}</span>`
+      : `<span class="sr-chip" data-id="${p.id}" style="--c:${TYPE_COLOR[p.type]}">${p.name}</span>`).join('');
+  document.getElementById('srBody').innerHTML = `
+    <div class="sr-grid">
+      <div class="sr-card" style="--c:${TYPE_COLOR.stator}">
+        <h3><span class="dot"></span>定子（Stator）—— 固定不动的部分</h3>
+        <p><b>作用：</b>① 建立并维持主磁场（励磁系统）；② 构成磁路的一部分（机座/磁轭）；③ 支承与保护整机（机座、端盖、轴承）；④ 把外部电源电流引入/引出（出线盒、电刷）。</p>
+        <p class="role"><b>判断要点：</b>外围的、不动的、建磁场的、接线的，都是定子。</p>
+        <div class="sr-chips">${group('stator')}</div>
+      </div>
+      <div class="sr-card" style="--c:${TYPE_COLOR.rotor}">
+        <h3><span class="dot"></span>转子（Rotor）—— 随转轴旋转的部分</h3>
+        <p><b>作用：</b>① 机电能量转换的核心（电枢系统：电枢铁芯 + 电枢绕组）；② 在磁场中受力产生电磁转矩（电动机）或感应电动势（发电机）；③ 输出/输入机械功率（转轴、风扇）。</p>
+        <p class="role"><b>判断要点：</b>中心的、转轴的、做转换的、带换向器的，都是转子。</p>
+        <div class="sr-chips">${group('rotor')}</div>
+      </div>
+    </div>
+    <div class="sr-compare">
+      <h3>四大判断方法</h3>
+      <table>
+        <thead><tr><th>判断角度</th><th>定子</th><th>转子</th></tr></thead>
+        <tbody>
+          <tr><td>① 是否转动</td><td>固定不动</td><td>随转轴旋转</td></tr>
+          <tr><td>② 空间位置</td><td>外围 / 机座内壁</td><td>中心 / 转轴</td></tr>
+          <tr><td>③ 功能角色</td><td>建磁场、接线、支承防护</td><td>能量转换、受力转动、输出转矩</td></tr>
+          <tr><td>④ 与电源/电流</td><td>励磁绕组、电刷、出线盒</td><td>电枢绕组、换向器</td></tr>
+        </tbody>
+      </table>
+      <p class="role" style="margin-top:10px"><b>特殊：气隙</b> —— ${partsByType('gap').map(p=>p.name).join('、')} 既不是定子也不是转子，是两者之间的空气间隙，是磁路中磁阻最大的地方。</p>
+    </div>`;
+  document.querySelectorAll('#srBody .sr-chip[data-id]').forEach(c=> c.onclick = ()=>{
+    clearMarks(); mark(c.dataset.id, 'pulse', 3000);
+    flash('已高亮：' + c.textContent, true);
+  });
+}
+document.getElementById('closeSR').onclick = closeSR;
+
+/* 视图 / 模式切换 */
+document.addEventListener('click', e=>{
+  const vb = e.target.closest('#viewSeg button');
+  if(vb){
+    if(S.level){ flash('闯关中不能切换视图，请先返回关卡地图', false); return; }
+    S.view = vb.dataset.view;
+    document.querySelectorAll('#viewSeg button').forEach(x=>x.classList.toggle('active', x===vb));
+    S.done = new Set(); resetRound(); renderSVG(); renderPanel(); return;
+  }
+  const mb = e.target.closest('#modeSeg button');
+  if(mb) setMode(mb.dataset.mode);
+});
+function setMode(m){
+  S.mode = m; S.level = 0; S.done = new Set();
+  // 练习模式（自由探索）显示部件名称；闯关模式隐藏名称
+  document.body.classList.toggle('showlabels', m === 'explore');
+  resetRound(); renderPanel(); syncModeButtons();
+}
+function syncModeButtons(){
+  // 在具体关卡中（find/quiz/drag）时，"闯关模式"保持高亮
+  const cur = (S.mode === 'explore') ? 'explore' : 'map';
+  document.querySelectorAll('#modeSeg button').forEach(x=> x.classList.toggle('active', x.dataset.mode === cur));
+}
+// 顶部工具条（动态插入到 stage 上方）
+(function addStageTools(){
+  const top = document.querySelector('.stage-top');
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap';
+  wrap.innerHTML = `
+    <div class="seg" id="viewSeg">
+      <button data-view="cross" class="active">径向横剖面</button>
+      <button data-view="axial">沿轴纵剖面</button>
+    </div>
+    <div class="seg" id="modeSeg">
+      <button data-mode="map" class="active">闯关模式</button>
+      <button data-mode="explore">练习模式（自由探索）</button>
+    </div>
+    <button id="srBtn">定子·转子辨析</button>`;
+  top.appendChild(wrap);
+  wrap.querySelector('#srBtn').onclick = ()=> openSR();
+})();
+
+/* ===================== 八、登录登记 ===================== */
+const loginMask = document.getElementById('loginMask');
+const sidEl = document.getElementById('sid');
+const nameEl = document.getElementById('sname');
+const errEl = document.getElementById('loginErr');
+const welcomeBox = document.getElementById('welcomeBox');
+
+function showErr(msg){ errEl.textContent = msg; }
+function validate(){
+  const sid = sidEl.value.trim();
+  const name = nameEl.value.trim();
+  if(!sid)  { showErr('学号不能为空，请填写学号。'); sidEl.focus(); return null; }
+  if(!/^\d{6,15}$/.test(sid)) { showErr('学号格式不正确：应为 6～15 位数字，请核对后重填。'); sidEl.focus(); return null; }
+  if(sid === TEACHER.id) { showErr('该号码为教师号，请点击下方「教师入口：查看 / 导出成绩」登录。'); sidEl.focus(); return null; }
+  if(!name) { showErr('姓名不能为空，请填写姓名。'); nameEl.focus(); return null; }
+  if(!/^[\u4e00-\u9fa5·]{2,10}$|^[A-Za-z][A-Za-z\s.]{1,19}$/.test(name)) { showErr('姓名格式不正确：请填写 2～10 个汉字的真实姓名。'); nameEl.focus(); return null; }
+  showErr('');
+  return {sid, name};
+}
+function previewStudent(){
+  const sid = sidEl.value.trim();
+  const s = /^\d{6,15}$/.test(sid) ? getStudent(sid) : null;
+  welcomeBox.innerHTML = s
+    ? `<div class="welcome">欢迎回来，<b>${s.name}</b>！已记录：累计积分 <b>${s.score}/${CAP}</b>，已通关 <b>${clearedList(s).length}/${LEVELS.length}</b> 关，闯关 <b>${s.attempts}</b> 次${s.lastTime ? '，最近一次 ' + s.lastTime : ''}。<br>本次沿用该成绩，可直接挑战<b>第 ${unlockedLevel(s)} 关</b>。</div>`
+    : '';
+}
+sidEl.addEventListener('input', previewStudent);
+sidEl.addEventListener('blur', previewStudent);
+[sidEl, nameEl].forEach(el=> el.addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('startBtn').click(); }));
+
+document.getElementById('startBtn').onclick = ()=>{
+  const v = validate(); if(!v) return;
+  S.isTeacher = false;
+  document.getElementById('switchBtn').textContent = '切换学生';
+  S.stu = touchStudent(v.sid, v.name);
+  loginMask.classList.add('hide');
+  document.getElementById('hud').style.display = 'flex';
+  updateHUD();
+  renderSVG(); setMode('map');
+  flash(`欢迎 ${S.stu.name}，已从第 ${unlockedLevel(S.stu)} 关开始挑战！`, true);
+};
+document.getElementById('switchBtn').onclick = ()=>{
+  if(S.isTeacher){
+    S.stu = null; S.isTeacher = false;
+    document.getElementById('switchBtn').textContent = '切换学生';
+    document.getElementById('hud').style.display = 'none';
+    teacherMenu.classList.remove('hide');
+    return;
+  }
+  S.stu = null;
+  sidEl.value = ''; nameEl.value = ''; welcomeBox.innerHTML = ''; showErr('');
+  loginMask.classList.remove('hide');
+  document.getElementById('hud').style.display = 'none';
+};
+
+/* ===================== 九、教师身份验证 ===================== */
+const TEACHER = { id: '123', name: 'F' };
+const TS_KEY = 'dcm_teacher_ok';
+let teacherOK = false;
+try { teacherOK = sessionStorage.getItem(TS_KEY) === 'ok'; } catch(e){}
+
+const teacherMask = document.getElementById('teacherMask');
+const teacherMenu = document.getElementById('teacherMenu');
+const tidEl    = document.getElementById('tid');
+const tnameEl  = document.getElementById('tname');
+const terrEl   = document.getElementById('teacherErr');
+
+function showTErr(msg){ terrEl.textContent = msg; }
+function syncTeacherBar(){
+  document.getElementById('teacherChip').style.display = teacherOK ? '' : 'none';
+  document.getElementById('logoutBtn').style.display  = teacherOK ? '' : 'none';
+  document.getElementById('teacherWho').textContent   = teacherOK ? TEACHER.name : '—';
+}
+function openTeacherLogin(){
+  showTErr('');
+  teacherMask.classList.remove('hide');
+  setTimeout(()=> tidEl.focus(), 30);
+}
+function requireTeacher(){
+  if(teacherOK) return true;
+  openTeacherLogin();
+  flash('请用教师号登录后才能查看 / 导出成绩', true);
+  return false;
+}
+function teacherLogin(){
+  const id = tidEl.value.trim();
+  const nm = tnameEl.value.trim();
+  if(!id){ showTErr('教师号不能为空，请输入教师号。'); tidEl.focus(); return; }
+  if(!/^\d{3,12}$/.test(id)){ showTErr('教师号格式不正确：应为 3～12 位数字。'); tidEl.focus(); return; }
+  if(!nm){ showTErr('姓名不能为空，请输入教师姓名。'); tnameEl.focus(); return; }
+  if(id !== TEACHER.id || nm !== TEACHER.name){ showTErr('教师号与姓名不匹配，无法进入教师后台。'); return; }
+  teacherOK = true;
+  try { sessionStorage.setItem(TS_KEY, 'ok'); } catch(e){}
+  showTErr(''); tidEl.value = ''; tnameEl.value = '';
+  teacherMask.classList.add('hide');
+  syncTeacherBar();
+  document.getElementById('tmName').textContent = TEACHER.name + ' 老师';
+  teacherMenu.classList.remove('hide');
+  flash('教师身份验证通过，欢迎 ' + TEACHER.name + ' 老师', true);
+}
+/* 教师以玩家身份进入闯关模式 */
+function teacherEnterPlay(){
+  S.isTeacher = true;
+  S.stu = touchStudent(TEACHER.id, TEACHER.name);
+  S.stu.isTeacher = true; saveDB(DB);
+  teacherMenu.classList.add('hide');
+  loginMask.classList.add('hide');
+  adminMask.classList.add('hide');
+  document.getElementById('hud').style.display = 'flex';
+  document.getElementById('switchBtn').textContent = '返回教师菜单';
+  updateHUD();
+  renderSVG(); setMode('map');
+  flash(`${TEACHER.name}老师（试玩模式），从第 ${unlockedLevel(S.stu)} 关开始挑战！`, true);
+}
+function teacherLogout(){
+  teacherOK = false;
+  try { sessionStorage.removeItem(TS_KEY); } catch(e){}
+  adminMask.classList.add('hide');
+  teacherMenu.classList.add('hide');
+  syncTeacherBar();
+  if(S.stu){ // 正在游戏中则退回学生登记页
+    S.stu = null; S.isTeacher = false;
+    document.getElementById('switchBtn').textContent = '切换学生';
+    document.getElementById('hud').style.display = 'none';
+    loginMask.classList.remove('hide');
+  }
+  flash('已退出教师登录，成绩查看与导出已锁定', true);
+}
+document.getElementById('teacherLoginBtn').onclick = teacherLogin;
+document.getElementById('teacherCancel').onclick = ()=>{ teacherMask.classList.add('hide'); showTErr(''); };
+document.getElementById('showTid').onchange = function(){ tidEl.type = this.checked ? 'text' : 'password'; };
+[tidEl, tnameEl].forEach(el=> el.addEventListener('keydown', e=>{ if(e.key === 'Enter') teacherLogin(); }));
+document.getElementById('teacherEntry').onclick = openTeacherLogin;
+document.getElementById('logoutBtn').onclick   = teacherLogout;
+document.getElementById('adminLogout').onclick = teacherLogout;
+document.getElementById('tmPlay').onclick  = ()=>{ teacherMenu.classList.add('hide'); teacherEnterPlay(); };
+document.getElementById('tmAdmin').onclick = ()=>{ teacherMenu.classList.add('hide'); adminMask.classList.remove('hide'); renderAdmin(); };
+document.getElementById('teacherMenuBack').onclick = ()=>{ teacherMenu.classList.add('hide'); teacherMask.classList.remove('hide'); };
+
+/* ===================== 云端同步（同源部署时启用） ===================== */
+const CLOUD = location.protocol.startsWith('http');   // file:// 下为 false，自动回退本机
+let ADMIN_SRC = 'local';
+
+// 学生每完成一轮，把本机快照推送到服务器（失败不影响本地游玩）
+function pushRecord(){
+  if(!CLOUD || !S.stu || S.stu.isTeacher) return;     // 不推送教师试玩记录
+  const s = S.stu;
+  const rec = {
+    sid:s.sid, name:s.name, score:s.score, attempts:s.attempts, success:s.success,
+    firstTime:s.firstTime, lastTime:s.lastTime,
+    history:s.history, cleared:s.cleared, best:s.best, fails:s.fails,
+    isTeacher:!!s.isTeacher
+  };
+  fetch('/api/record', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(rec)})
+    .catch(()=>{});
+}
+
+// 教师拉取云端汇总（带教师号+姓名，服务端二次校验）
+async function fetchCloudStudents(){
+  try{
+    const r = await fetch(`/api/records?sid=${encodeURIComponent(TEACHER.id)}&name=${encodeURIComponent(TEACHER.name)}`);
+    if(!r.ok) return null;
+    const j = await r.json();
+    if(!j || !Array.isArray(j.students)) return null;
+    return j.students.map(s=>({...s, rate: avgRate(s)}));
+  }catch(e){ return null; }
+}
+
+// 关键词筛选 + 排序（本地与云端共用）
+function applyKwSort(list){
+  const kw = (document.getElementById('kw').value||'').trim().toLowerCase();
+  if(kw) list = list.filter(s => (s.sid||'').toLowerCase().includes(kw) || (s.name||'').toLowerCase().includes(kw));
+  const dir = sortAsc ? 1 : -1;
+  list.sort((a,b)=>{
+    let r = 0;
+    if(sortKey==='score')    r = a.score - b.score;
+    else if(sortKey==='attempts') r = a.attempts - b.attempts;
+    else if(sortKey==='success')  r = a.success - b.success;
+    else if(sortKey==='rate')     r = a.rate - b.rate;
+    else if(sortKey==='cleared')  r = clearedList(a).length - clearedList(b).length;
+    else if(sortKey==='sid')      r = String(a.sid).localeCompare(String(b.sid));
+    else if(sortKey==='name')     r = (a.name||'').localeCompare(b.name||'', 'zh');
+    else r = (a.lastTime||'').localeCompare(b.lastTime||'');
+    return r * dir;
+  });
+  return list;
+}
+
+// 导出用：云端优先取全量，否则本机
+async function getExportStudents(){
+  if(CLOUD){
+    const cloud = await fetchCloudStudents();
+    if(cloud) return cloud;
+  }
+  return Object.values(DB).map(s=>({...s, rate: avgRate(s)}));
+}
+
+/* ===================== 十、教师后台 ===================== */
+const adminMask = document.getElementById('adminMask');
+const tbody = document.getElementById('tbody');
+let sortKey = 'time', sortAsc = false;
+
+document.getElementById('adminBtn').onclick = ()=>{ if(requireTeacher()){ adminMask.classList.remove('hide'); renderAdmin(); } };
+document.getElementById('closeAdmin').onclick = ()=> adminMask.classList.add('hide');
+document.getElementById('kw').addEventListener('input', renderAdmin);
+document.getElementById('sortScore').onclick = ()=>{ sortKey='score'; sortAsc=!sortAsc; renderAdmin(); };
+document.getElementById('sortTime').onclick  = ()=>{ sortKey='time';  sortAsc=!sortAsc; renderAdmin(); };
+document.querySelectorAll('#tbl thead th').forEach((th,i)=> th.onclick = ()=>{
+  const keys = ['idx','sid','name','score','cleared','attempts','success','rate','time',''];
+  if(!keys[i]) return;
+  if(sortKey === keys[i]) sortAsc = !sortAsc; else { sortKey = keys[i]; sortAsc = true; }
+  renderAdmin();
+});
+
+function allStudents(){
+  return applyKwSort(Object.values(DB).map(s=>({...s, rate: avgRate(s)})));
+}
+async function renderAdmin(){
+  let list, src;
+  if(CLOUD){
+    const cloud = await fetchCloudStudents();      // 优先取云端实时汇总
+    if(cloud){ list = applyKwSort(cloud); src = 'cloud'; }
+  }
+  if(!list){ list = allStudents(); src = 'local'; }
+  ADMIN_SRC = src;
+  const students = list.filter(s=>!s.isTeacher);
+  document.getElementById('sumBox').innerHTML = `
+    <div><b>${students.length}</b><span>参与学生数</span></div>
+    <div><b>${students.reduce((a,b)=>a+b.attempts,0)}</b><span>总闯关次数</span></div>
+    <div><b>${students.reduce((a,b)=>a+b.score,0)}</b><span>总积分</span></div>
+    <div><b>${students.length ? (students.reduce((a,b)=>a+b.score,0)/students.length).toFixed(2) : 0}</b><span>人均积分</span></div>
+    <div><b>${students.filter(s=>s.score>=CAP).length}</b><span>满分人数</span></div>
+    <div style="border-left:3px solid ${src==='cloud'?'#10b981':'#f59e0b'};padding-left:8px"><b style="color:${src==='cloud'?'#047857':'#b45309'}">${src==='cloud'?'☁ 云端实时':'💾 本机缓存'}</b><span>数据来源</span></div>`;
+  tbody.innerHTML = list.length ? list.map((s,i)=>`
+    <tr>
+      <td class="num">${i+1}</td>
+      <td>${s.sid}</td>
+      <td>${s.name}${s.isTeacher ? ' <span class="pill teacher">教师</span>' : ''}</td>
+      <td class="num"><span class="pill ${s.score>=CAP?'full':''}">${s.score}</span></td>
+      <td>${clearedList(s).length}/${LEVELS.length}${clearedList(s).length ? '（'+clearedList(s).join('、')+'）' : ''}</td>
+      <td class="num">${s.attempts}</td>
+      <td class="num">${s.success}</td>
+      <td class="num">${s.rate}%</td>
+      <td>${s.lastTime || '—'}</td>
+      <td><button data-sid="${s.sid}" class="detail">明细 ${s.history.length}</button></td>
+    </tr>
+    <tr class="fold" id="fold-${s.sid}" style="display:none"><td colspan="10">
+      ${s.history.length ? s.history.slice().reverse().map(h=>
+        `· ${h.t} ｜ ${h.level ? '第'+h.level+'关 · ' : ''}${h.mode}（${h.view}）｜ 答对 ${h.right}/${h.total} ｜ 正确率 ${h.rate}% ｜ ${h.pass ? (h.gained ? '集齐5关 +1 分' : '本关通过(未集齐或已计分)') : '未通过'}`
+      ).join('<br>') : '暂无闯关记录'}
+    </td></tr>`).join('') : `<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:20px">暂无数据</td></tr>`;
+  tbody.querySelectorAll('.detail').forEach(b=> b.onclick = ()=>{
+    const tr = document.getElementById('fold-' + b.dataset.sid);
+    tr.style.display = tr.style.display === 'none' ? '' : 'none';
+  });
+}
+function download(name, content, type){
+  const blob = new Blob([content], {type: type || 'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+}
+const csvCell = v => `"${String(v).replace(/"/g,'""')}"`;
+function toCSV(rows){
+  return '\ufeff' + rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
+}
+document.getElementById('expCsv').onclick = async ()=>{
+  if(!requireTeacher()) return;
+  const list = await getExportStudents();   // 云端优先，全量不受搜索框筛选影响
+  list.sort((a,b)=> String(a.sid).localeCompare(String(b.sid)));
+  const rows = [['序号','学号','姓名','身份','累计得分','闯关次数','成功次数','平均正确率','首次参与时间','最近闯关时间']];
+  list.forEach((s,i)=> rows.push([i+1, s.sid, s.name, s.isTeacher ? '教师' : '学生', s.score, s.attempts, s.success, s.rate + '%', s.firstTime, s.lastTime || '']));
+  download(`直流电机闯关成绩_${nowStr().slice(0,10)}.csv`, toCSV(rows), 'text/csv;charset=utf-8');
+};
+document.getElementById('expDetail').onclick = async ()=>{
+  if(!requireTeacher()) return;
+  const list = await getExportStudents();
+  const rows = [['学号','姓名','时间','玩法','视图','答对题数','总题数','正确率','本次加分']];
+  list.forEach(s=> (s.history||[]).forEach(h=> rows.push([s.sid, s.name, h.t, h.mode, h.view, h.right, h.total, h.rate + '%', h.gained])));
+  download(`直流电机闯关明细_${nowStr().slice(0,10)}.csv`, toCSV(rows), 'text/csv;charset=utf-8');
+};
+document.getElementById('expJson').onclick = async ()=>{
+  if(!requireTeacher()) return;
+  const list = await getExportStudents();
+  const obj = {}; list.forEach(s=> obj[s.sid] = s);
+  download(`直流电机闯关备份_${nowStr().slice(0,10)}.json`, JSON.stringify(obj, null, 2), 'application/json');
+};
+document.getElementById('impJson').onclick = ()=>{ if(requireTeacher()) document.getElementById('fileInput').click(); };
+document.getElementById('fileInput').onchange = e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{
+    try{
+      const data = JSON.parse(r.result);
+      let n = 0;
+      Object.values(data).forEach(s=>{
+        if(!s || !s.sid) return;
+        const cur = DB[s.sid];
+        if(!cur){ DB[s.sid] = s; n++; }
+        else{
+          cur.score = Math.max(cur.score, s.score || 0);
+          cur.attempts = Math.max(cur.attempts, s.attempts || 0);
+          cur.success = Math.max(cur.success, s.success || 0);
+          cur.history = [...(cur.history||[]), ...(s.history||[])].slice(-200);
+          cur.lastTime = [cur.lastTime, s.lastTime].filter(Boolean).sort().pop() || '';
+          n++;
+        }
+      });
+      saveDB(DB); renderAdmin();
+      flash('已导入并合并 ' + n + ' 条学生记录', true);
+    }catch(err){ alert('文件格式不正确，导入失败：' + err.message); }
+  };
+  r.readAsText(f, 'utf-8');
+  e.target.value = '';
+};
+document.getElementById('clearAll').onclick = async ()=>{
+  if(!requireTeacher()) return;
+  if(!confirm('确定清空全部学生闯关数据？此操作不可恢复，建议先导出备份。')) return;
+  DB = {}; saveDB(DB);
+  if(CLOUD){ try{ await fetch(`/api/clear?sid=${encodeURIComponent(TEACHER.id)}&name=${encodeURIComponent(TEACHER.name)}`, {method:'POST'}); }catch(e){} }
+  renderAdmin(); flash('已清空全部数据', true);
+};
+
+// 后台打开时每 8 秒自动刷新（仅云端），无需手动点
+setInterval(()=>{ if(CLOUD && !adminMask.classList.contains('hide')) renderAdmin(); }, 8000);
+
+/* ===================== 启动 ===================== */
+syncTeacherBar();
+syncModeButtons();
+renderSVG();
+renderPanel();
+</script>
+</body>
+</html>

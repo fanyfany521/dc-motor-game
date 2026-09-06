@@ -1,0 +1,13 @@
+{
+  "name": "dc-motor-challenge-server",
+  "version": "1.0.0",
+  "description": "直流电机结构闯关游戏 - 云端成绩汇总服务器",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "private": true
+}
