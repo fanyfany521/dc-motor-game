@@ -70,6 +70,11 @@ const server = http.createServer((req, res) => {
   const u = new URL(req.url, 'http://localhost');
   const p = u.pathname;
 
+  // ---- 健康检查（供 Render 等平台探活） ----
+  if (p === '/api/health' || p === '/healthz') {
+    return sendJSON(res, 200, { ok: true, ts: Date.now() });
+  }
+
   // ---- 学生提交成绩 ----
   if (p === '/api/record' && req.method === 'POST') {
     let body = '';
@@ -83,6 +88,7 @@ const server = http.createServer((req, res) => {
       const clean = {
         sid: rec.sid,
         name: String(rec.name).slice(0, 20),
+        cls: String(rec.cls || '').slice(0, 10),
         score: +rec.score || 0,
         attempts: +rec.attempts || 0,
         success: +rec.success || 0,
@@ -103,6 +109,7 @@ const server = http.createServer((req, res) => {
       const better = !prev || clean.score > prevScore
         || (clean.score === prevScore && curCleared > prevCleared);
       if (better) mem[clean.sid] = clean;
+      else if (clean.cls && prev && !prev.cls) prev.cls = clean.cls;  // 老快照补班级
       appendLine(clean).then(() => sendJSON(res, 200, { ok: true }));
     });
     return;
@@ -151,6 +158,30 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`直流电机闯关服务已启动 → http://localhost:${PORT}`);
-  console.log(`游戏页面: /   教师后台: /admin   数据文件: ${DATA_FILE}`);
+  console.log(`\n========== 直流电机闯关服务已启动 ==========`);
+  console.log(`  本机访问:   http://localhost:${PORT}`);
+  console.log(`  教师后台:   http://localhost:${PORT}/admin  （账号 123 / F）`);
+  console.log(`  游戏页面:   http://localhost:${PORT}/`);
+  console.log(`  数据文件:   ${DATA_FILE}`);
+  // 列出本机可用的内网 IPv4，方便给学生发"课堂访问地址"
+  const os = require('os');
+  const ifaces = os.networkInterfaces();
+  const urls = [];
+  for (const name of Object.keys(ifaces)) {
+    for (const i of ifaces[name] || []) {
+      if (i.family === 'IPv4' && !i.internal && !i.address.startsWith('169.254')) {
+        urls.push(`http://${i.address}:${PORT}`);
+      }
+    }
+  }
+  if (urls.length) {
+    console.log('  ──────────────────────────────────────────');
+    console.log('  课堂地址（发给学生，同 WiFi 下打开）:');
+    urls.forEach(u => console.log('    ' + u));
+  } else {
+    console.log('  ⚠️ 未检测到内网 IP，请确认本机已连上 WiFi/有线网');
+  }
+  console.log('  ──────────────────────────────────────────');
+  console.log('  按 Ctrl+C 停止服务');
+  console.log('==========================================\n');
 });
